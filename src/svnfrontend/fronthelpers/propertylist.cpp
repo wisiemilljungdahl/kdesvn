@@ -57,8 +57,8 @@ void Propertylist::init()
 void Propertylist::displayList(const svn::PathPropertiesMapListPtr &propList, bool editable, bool isDir, const QString &aCur)
 {
     disconnect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(slotItemChanged(QTreeWidgetItem*,int)));
-    clear();
     viewport()->setUpdatesEnabled(false);
+    clear();
     m_Dir = isDir;
     if (propList) {
         m_current = aCur;

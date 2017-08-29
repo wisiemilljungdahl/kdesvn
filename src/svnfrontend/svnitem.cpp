@@ -217,105 +217,63 @@ const QDateTime &SvnItem::fullDate()const
     return (p_Item->m_fullDate);
 }
 
-QPixmap SvnItem::internalTransform(const QPixmap &first, int size)
-{
-    if (first.isNull()) {
-        return QPixmap();
-    }
-    QPixmap _p = first.scaled(QSize(size, size), Qt::KeepAspectRatio);
-    if (_p.width() == size && _p.height() == size) {
-        return _p;
-    }
-    QPixmap result(size, size);
-    result.fill(Qt::transparent);
-    QPainter pa;
-    pa.begin(&result);
-    int w = _p.width() > size ? size : _p.width();
-    int h = _p.height() > size ? size : _p.height();
-    pa.drawPixmap(0, 0, _p, 0, 0, w, h);
-    pa.end();
-    return result;
-}
-
 QPixmap SvnItem::getPixmap(const QPixmap &_p, int size, bool overlay)
 {
+    Q_UNUSED(size);
+
     if (!isVersioned()) {
         m_bgColor = NOTVERSIONED;
     } else if (isRealVersioned()) {
         SvnActions *wrap = getWrapper();
         bool mod = false;
-        QPixmap p2;
+        QStringList overlays;
         if (p_Item->m_Stat->nodeStatus() == svn_wc_status_conflicted) {
             m_bgColor = CONFLICT;
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnconflicted"), KIconLoader::Desktop, size);
-            }
+            overlays.append("vcs-conflicting");
         } else if (p_Item->m_Stat->nodeStatus() == svn_wc_status_missing) {
             m_bgColor = MISSING;
         } else if (isLocked() || (wrap && wrap->checkReposLockCache(fullName()))) {
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnlocked"), KIconLoader::Desktop, size);
-            }
+            overlays.append("emblem-locked");
             m_bgColor = LOCKED;
         } else if (Kdesvnsettings::check_needslock() && !isRemoteAdded() && wrap && wrap->isLockNeeded(this, svn::Revision::UNDEFINED)) {
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnneedlock"), KIconLoader::Desktop, size);
-            }
+            overlays.append("emblem-mounted");
             m_bgColor = NEEDLOCK;
         } else if (wrap && wrap->isUpdated(p_Item->m_Stat->path())) {
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnupdates"), KIconLoader::Desktop, size);
-            }
+            overlays.append("vcs-update-required");
             m_bgColor = UPDATES;
         } else if (p_Item->m_Stat->nodeStatus() == svn_wc_status_deleted) {
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvndeleted"), KIconLoader::Desktop, size);
-            }
+            overlays.append("vcs-removed");
             m_bgColor = DELETED;
         } else if (p_Item->m_Stat->nodeStatus() == svn_wc_status_added) {
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnadded"), KIconLoader::Desktop, size);
-            }
+            overlays.append("vcs-added");
             m_bgColor = ADDED;
         } else if (isModified()) {
             mod = true;
         } else if (isDir() && wrap) {
             if (isRemoteAdded() || wrap->checkUpdateCache(fullName())) {
-                if (overlay) {
-                    p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnupdates"), KIconLoader::Desktop, size);
-                }
+                overlays.append("vcs-update-required");
                 m_bgColor = UPDATES;
             } else if (wrap->checkConflictedCache(fullName())) {
                 m_bgColor = CONFLICT;
-                if (overlay) {
-                    p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnconflicted"), KIconLoader::Desktop, size);
-                }
+                overlays.append("vcs-conflicting");
             } else {
                 mod = wrap->checkModifiedCache(fullName());
             }
         }
         if (mod) {
             m_bgColor = MODIFIED;
-            if (overlay) {
-                p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnmodified"), KIconLoader::Desktop, size);
-            }
+            overlays.append("vcs-locally-modified");
         }
-        if (!p2.isNull()) {
-            QPixmap p;
-            if (_p.width() != size || _p.height() != size) {
-                p = internalTransform(_p, size);
-            } else {
-                p = _p;
+        if (p_Item->isExternal) {
+            if(overlays.size() == 0) {
+                overlays.append("");
             }
-            if (p2.width() != size || p2.height() != size) {
-                p2 = internalTransform(p2, size);
-            }
-            m_overlaycolor = true;
-            QImage i1(p.toImage());
-            QImage i2(p2.toImage());
-
-            KIconEffect::overlay(i1, i2);
-            return QPixmap::fromImage(i1);
+            overlays.append("link");
+        }
+        if (overlay && overlays.size() > 0) {
+            QPixmap p = _p;
+            KIconLoader::global()->drawOverlays(overlays, p, KIconLoader::Desktop);
+            return p;
         }
     }
     return _p;
@@ -342,13 +300,9 @@ QPixmap SvnItem::getPixmap(int size, bool overlay)
         if (isLocked()) {
             m_bgColor = LOCKED;
             if (overlay) {
-                QPixmap p2 = KIconLoader::global()->loadIcon(QStringLiteral("kdesvnlocked"), KIconLoader::Desktop, size);
-                if (!p2.isNull()) {
-                    QImage i1; i1 = p.toImage();
-                    QImage i2; i2 = p2.toImage();
-                    KIconEffect::overlay(i1, i2);
-                    p.fromImage(i1);
-                }
+                QStringList overlays;
+                overlays.append("emblem-locked");
+                KIconLoader::global()->drawOverlays(overlays, p, KIconLoader::Desktop);
             }
         }
     } else {

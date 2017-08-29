@@ -110,8 +110,6 @@ protected:
     QScopedPointer<SvnItem_p> p_Item;
     virtual SvnActions *getWrapper()const = 0;
 
-    static QPixmap internalTransform(const QPixmap &, int size);
-
 };
 
 #endif

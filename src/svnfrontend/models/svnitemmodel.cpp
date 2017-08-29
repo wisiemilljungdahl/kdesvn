@@ -454,6 +454,10 @@ void SvnItemModel::insertDirs(SvnItemModelNode *_parent, svn::StatusEntries &dli
                 m_Data->addWatchFile(node->fullName());
             }
         }
+
+        if((*it)->nodeStatus() == svn_wc_status_external) {
+            refreshItem(node);
+        }
 #ifdef DEBUG_TIMER
 //        qCDebug(KDESVN_LOG)<<"Time add watch: "<<_counttime.elapsed();
         _counttime.restart();
@@ -853,6 +857,9 @@ bool SvnItemModel::refreshDirnode(SvnItemModelNodeDir *node, bool check_empty, b
         int index = node->indexOf((*it)->path());
         if (index != -1) {
             node->m_Children[index]->setStat((*it));
+            if((*it)->nodeStatus() == svn_wc_status_external) {
+                refreshItem(node->m_Children[index]);
+            }
             if (node->m_Children[index]->NodeIsDir() != node->m_Children[index]->isDir()) {
                 SvnItemModelNode *n = node->m_Children[index];
                 beginRemoveRows(ind, index, index);

@@ -58,7 +58,7 @@ void GetInfoThread::run()
             }
             if (current) {
                 if (!current->hasToolTipText()) {
-                    if (current->isRealVersioned() && !current->stat()->entry().url().isEmpty()) {
+                    if (current->isRealVersioned()) {
                         if (svn::Url::isValid(current->fullName())) {
                             rev = current->revision();
                         } else {

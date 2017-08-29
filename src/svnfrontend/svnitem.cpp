@@ -51,6 +51,7 @@ public:
     QMimeType mimeType(bool dir);
 
     svn::StatusPtr m_Stat;
+    svn::StatusPtr m_externalStat;
     void init();
     QUrl m_url;
     QString m_full, m_short;
@@ -59,6 +60,7 @@ public:
     QString m_infoText;
     KFileItem m_fitem;
     bool isWc;
+    bool isExternal;
     svn::Revision lRev;
     QMimeType m_mimeType;
     QMutex _infoTextMutex;
@@ -98,6 +100,7 @@ void SvnItem_p::init()
     m_url = m_Stat->entry().url();
     m_fullDate = m_Stat->entry().cmtDate().toQDateTime();
     m_infoText.clear();
+    isExternal = (m_Stat->nodeStatus() == svn_wc_status_external);
 }
 
 QMimeType SvnItem_p::mimeType(bool dir)
@@ -166,12 +169,19 @@ SvnItem::~SvnItem()
 void SvnItem::setStat(const svn::StatusPtr &aStat)
 {
     m_overlaycolor = false;
-    p_Item.reset(new SvnItem_p(aStat));
-    SvnActions *wrap = getWrapper();
-    if (isChanged() || isConflicted()) {
-        wrap->addModifiedCache(aStat);
-    } else {
-        wrap->deleteFromModifiedCache(fullName());
+    if (!p_Item.isNull() && p_Item->isExternal) {
+        p_Item->m_externalStat = aStat;
+        p_Item->m_url = p_Item->m_externalStat->entry().url();
+        p_Item->m_fullDate = p_Item->m_externalStat->entry().cmtDate().toQDateTime();
+    }
+    else {
+        p_Item.reset(new SvnItem_p(aStat));
+        SvnActions *wrap = getWrapper();
+        if (isChanged() || isConflicted()) {
+            wrap->addModifiedCache(aStat);
+        } else {
+            wrap->deleteFromModifiedCache(fullName());
+        }
     }
 }
 
@@ -465,11 +475,17 @@ QString SvnItem::infoText()const
 
 QString SvnItem::cmtAuthor()const
 {
+    if (p_Item->isExternal && p_Item->m_externalStat) {
+        return p_Item->m_externalStat->entry().cmtAuthor();
+    }
     return p_Item->m_Stat->entry().cmtAuthor();
 }
 
 long int SvnItem::cmtRev()const
 {
+    if (p_Item->isExternal && p_Item->m_externalStat) {
+        return p_Item->m_externalStat->entry().cmtRev();
+    }
     return p_Item->m_Stat->entry().cmtRev();
 }
 
@@ -514,6 +530,11 @@ const svn::StatusPtr &SvnItem::stat()const
     return p_Item->m_Stat;
 }
 
+const svn::StatusPtr& SvnItem::externalStat()const
+{
+    return p_Item->m_externalStat;
+}
+
 /*!
     \fn SvnItem::isNormal()const
  */
@@ -545,7 +566,7 @@ bool SvnItem::hasToolTipText()
 
 svn::Revision SvnItem::revision() const
 {
-    if (isRealVersioned() && !p_Item->m_Stat->entry().url().isEmpty()) {
+    if (isRealVersioned()) {
         return p_Item->m_Stat->entry().revision();
     }
     return svn::Revision::UNDEFINED;
@@ -559,7 +580,7 @@ const QString &SvnItem::getToolTipText()
     if (!hasToolTipText()) {
         qCDebug(KDESVN_LOG) << "Try getting text" << endl;
         QString text;
-        if (isRealVersioned() && !p_Item->m_Stat->entry().url().isEmpty()) {
+        if (isRealVersioned()) {
             SvnActions *wrap = getWrapper();
             svn::Revision peg(svn_opt_revision_unspecified);
             svn::Revision rev(svn_opt_revision_unspecified);
@@ -596,7 +617,7 @@ const QString &SvnItem::getToolTipText()
 void SvnItem::generateToolTip(const svn::InfoEntry &entry)
 {
     QString text;
-    if (isRealVersioned() &&  !p_Item->m_Stat->entry().url().isEmpty()) {
+    if (isRealVersioned()) {
         SvnActions *wrap = getWrapper();
         if (wrap) {
             svn::InfoEntries e; e.append(entry);

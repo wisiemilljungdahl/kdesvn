@@ -81,6 +81,7 @@ public:
     }
     virtual void setStat(const svn::StatusPtr &);
     virtual const svn::StatusPtr &stat()const;
+    virtual const svn::StatusPtr& externalStat()const;
     virtual bool isModified()const;
     virtual bool isChildModified()const;
     bool isNormal()const;

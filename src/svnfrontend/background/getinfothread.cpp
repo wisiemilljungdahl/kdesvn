@@ -42,14 +42,14 @@ void GetInfoThread::run()
     svn::InfoEntry info;
     svn::Revision rev = svn::Revision::UNDEFINED;
     try {
-        while (1) {
+        while (true) {
             {
                 QReadLocker cl(&m_CancelLock);
                 if (m_Cancel) {
                     break;
                 }
             }
-            SvnItemModelNode *current = 0;
+            SvnItemModelNode *current = nullptr;
             {
                 QMutexLocker ml(&m_QueueLock);
                 if (!m_NodeQueue.isEmpty()) {

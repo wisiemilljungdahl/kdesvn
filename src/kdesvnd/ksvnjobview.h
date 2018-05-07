@@ -27,8 +27,7 @@ class KsvnJobView: public org::kde::JobViewV2
     Q_OBJECT
 
 public:
-    KsvnJobView(qulonglong id, const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
-    virtual ~KsvnJobView() {}
+    KsvnJobView(qulonglong id, const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = nullptr);
 
     enum jobstate {
         STOPPED = 0,

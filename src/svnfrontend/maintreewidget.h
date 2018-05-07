@@ -39,15 +39,15 @@ class MainTreeWidget: public QWidget, public Ui::mainTreeWidget, public ItemDisp
 {
     Q_OBJECT
 public:
-    explicit MainTreeWidget(KActionCollection *aCollection, QWidget *parent = 0, Qt::WindowFlags f = 0);
-    virtual ~MainTreeWidget();
+    explicit MainTreeWidget(KActionCollection *aCollection, QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+    ~MainTreeWidget();
 
-    virtual QWidget *realWidget();
-    virtual SvnItem *Selected()const;
-    virtual SvnItemList SelectionList()const;
-    virtual svn::Revision baseRevision()const;
-    virtual bool openUrl(const QUrl &url, bool noReinit = false);
-    virtual SvnItem *SelectedOrMain()const;
+    QWidget *realWidget() override;
+    SvnItem *Selected()const override;
+    SvnItemList SelectionList()const override;
+    svn::Revision baseRevision()const override;
+    bool openUrl(const QUrl &url, bool noReinit = false) override;
+    SvnItem *SelectedOrMain()const override;
 
     SvnItem *DirSelected()const;
     QModelIndex SelectedIndex()const;
@@ -90,7 +90,7 @@ protected Q_SLOTS:
     void slotItemActivated(const QModelIndex &);
     void slotItemExpanded(const QModelIndex &);
     void slotItemsInserted(const QModelIndex &);
-    void slotRescanIcons();
+    void slotRefreshItem(const QString &path);
     void _propListTimeout();
 
     void slotCheckUpdates();
@@ -165,7 +165,7 @@ protected Q_SLOTS:
 
     void resizeAllColumns();
 protected:
-    virtual void keyPressEvent(QKeyEvent *);
+    void keyPressEvent(QKeyEvent *) override;
     void setupActions();
     bool uniqueTypeSelected();
     KService::List offersList(SvnItem *item, bool execOnly = false)const;

@@ -26,8 +26,8 @@ class LoadDmpDlg_impl: public QWidget, public Ui::LoadDmpDlg
 {
     Q_OBJECT
 public:
-    explicit LoadDmpDlg_impl(QWidget *parent = 0);
-    virtual ~LoadDmpDlg_impl();
+    explicit LoadDmpDlg_impl(QWidget *parent = nullptr);
+    ~LoadDmpDlg_impl();
     bool usePost()const;
     bool usePre()const;
     bool validateProps()const;

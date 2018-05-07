@@ -26,8 +26,8 @@ class DiffMergeSettings_impl: public QWidget, public Ui::DiffMergeSettings
 {
     Q_OBJECT
 public:
-    explicit DiffMergeSettings_impl(QWidget *parent = 0);
-    virtual ~DiffMergeSettings_impl();
+    explicit DiffMergeSettings_impl(QWidget *parent = nullptr);
+    ~DiffMergeSettings_impl();
 protected slots:
     virtual void diffDispChanged(bool);
 };

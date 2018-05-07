@@ -26,12 +26,12 @@ class SvnTreeView: public QTreeView
 {
     Q_OBJECT
 public:
-    explicit SvnTreeView(QWidget *parent = 0);
-    virtual ~SvnTreeView();
+    explicit SvnTreeView(QWidget *parent = nullptr);
+    ~SvnTreeView();
 
 protected:
-    virtual void startDrag(Qt::DropActions supportedActions);
-    virtual void dropEvent(QDropEvent *event);
+    void startDrag(Qt::DropActions supportedActions) override;
+    void dropEvent(QDropEvent *event) override;
 
 protected Q_SLOTS:
     void doDrop(const QList<QUrl> &, const QModelIndex &, bool, Qt::DropAction, Qt::KeyboardModifiers);

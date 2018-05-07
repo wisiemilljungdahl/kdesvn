@@ -56,11 +56,6 @@ Path::Path(const QString &path)
     init(path);
 }
 
-Path::Path(const QUrl &path)
-{
-    init(path.toString());
-}
-
 void
 Path::init(const QString &path)
 {
@@ -158,12 +153,12 @@ void
 Path::parsePeg(const QString &pathorurl, Path &_path, svn::Revision &_peg)
 {
     const QByteArray _buf = pathorurl.toUtf8();
-    const char *truepath = 0;
+    const char *truepath = nullptr;
     svn_opt_revision_t pegr;
 
     Pool pool;
     svn_error_t *error = svn_opt_parse_path(&pegr, &truepath, _buf, pool);
-    if (error != 0) {
+    if (error != nullptr) {
         throw ClientException(error);
     }
     //qDebug("Path: %s",truepath);

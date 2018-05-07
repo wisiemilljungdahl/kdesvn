@@ -254,7 +254,7 @@ void kdesvnView::slotCreateRepo()
 void kdesvnView::slotHotcopy()
 {
     QPointer<KSvnSimpleOkDialog> dlg(new KSvnSimpleOkDialog(QStringLiteral("hotcopy_repo_size"), QApplication::activeModalWidget()));
-    dlg->setWindowTitle(i18n("Hotcopy a repository"));
+    dlg->setWindowTitle(i18nc("@title:window", "Hotcopy a Repository"));
     dlg->setWithCancelButton();
 
     HotcopyDlg_impl *ptr = new HotcopyDlg_impl(dlg);
@@ -281,7 +281,7 @@ void kdesvnView::slotHotcopy()
 void kdesvnView::slotLoaddump()
 {
     QPointer<KSvnSimpleOkDialog> dlg(new KSvnSimpleOkDialog(QStringLiteral("loaddump_repo_size"), this));
-    dlg->setWindowTitle(i18n("Load a repository from a svndump"));
+    dlg->setWindowTitle(i18nc("@title:window", "Load a Repository From an svndump"));
     dlg->setWithCancelButton();
 
     LoadDmpDlg_impl *ptr(new LoadDmpDlg_impl(dlg));
@@ -331,7 +331,7 @@ void kdesvnView::slotLoaddump()
     }
 
     try {
-        StopDlg sdlg(this, this, i18n("Load Dump"), i18n("Loading a dump into a repository."));
+        StopDlg sdlg(this, this, i18nc("@title:window", "Load Dump"), i18n("Loading a dump into a repository."));
         _rep.loaddump(_input, _act, ptr->parentPath(), ptr->usePre(), ptr->usePost(), ptr->validateProps());
         slotAppendLog(i18n("Loading dump finished."));
     } catch (const svn::ClientException &e) {
@@ -343,7 +343,7 @@ void kdesvnView::slotLoaddump()
 void kdesvnView::slotDumpRepo()
 {
     QPointer<KSvnSimpleOkDialog> dlg(new KSvnSimpleOkDialog(QStringLiteral("dump_repo_size"), QApplication::activeModalWidget()));
-    dlg->setWindowTitle(i18n("Dump a repository"));
+    dlg->setWindowTitle(i18nc("@title:window", "Dump a Repository"));
     dlg->setWithCancelButton();
 
     DumpRepo_impl *ptr(new DumpRepo_impl(dlg));
@@ -383,7 +383,7 @@ void kdesvnView::slotDumpRepo()
     }
 
     try {
-        StopDlg sdlg(this, this, i18n("Dump"), i18n("Dumping a repository"));
+        StopDlg sdlg(this, this, i18nc("@title:window", "Dump"), i18n("Dumping a repository"));
         _rep->dump(out, st, en, incr, diffs);
         slotAppendLog(i18n("Dump finished."));
     } catch (const svn::ClientException &e) {
@@ -438,7 +438,7 @@ void kdesvnView::fillCacheStatus(qlonglong current, qlonglong max)
         m_CacheProgressBar->setValue((int)current);
     } else {
         delete m_CacheProgressBar;
-        m_CacheProgressBar = 0;
+        m_CacheProgressBar = nullptr;
     }
 }
 

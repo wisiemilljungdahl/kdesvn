@@ -28,8 +28,8 @@ class CheckoutInfo_impl: public QWidget, public Ui::CheckoutInfo
 {
     Q_OBJECT
 public:
-    explicit CheckoutInfo_impl(QWidget *parent = 0);
-    virtual ~CheckoutInfo_impl();
+    explicit CheckoutInfo_impl(QWidget *parent = nullptr);
+    ~CheckoutInfo_impl();
 
     svn::Revision toRevision() const;
     QUrl reposURL() const;

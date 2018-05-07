@@ -72,7 +72,7 @@ public:
     void prepareUpdate(bool ask);
 
     bool makeGet(const svn::Revision &start, const QString &what, const QString &target,
-                 const svn::Revision &peg = svn::Revision::UNDEFINED, QWidget *dlgparent = 0);
+                 const svn::Revision &peg = svn::Revision::UNDEFINED, QWidget *dlgparent = nullptr);
 
     bool addItems(const svn::Paths &items, svn::Depth depth = svn::DepthEmpty);
     void checkAddItems(const QString &path, bool print_error_box = true);
@@ -89,10 +89,10 @@ public:
     bool makeList(const QString &url, svn::DirEntries &dlist, const svn::Revision &where, svn::Depth depth = svn::DepthInfinity);
 
     bool createModifiedCache(const QString &base);
-    bool checkModifiedCache(const QString &path);
-    bool checkConflictedCache(const QString &path);
-    bool checkReposLockCache(const QString &path);
-    bool checkReposLockCache(const QString &path, svn::StatusPtr &t);
+    bool checkModifiedCache(const QString &path) const;
+    bool checkConflictedCache(const QString &path) const;
+    bool checkReposLockCache(const QString &path) const;
+    bool checkReposLockCache(const QString &path, svn::StatusPtr &t) const;
     void addModifiedCache(const svn::StatusPtr &what);
     void deleteFromModifiedCache(const QString &what);
 
@@ -118,12 +118,12 @@ public:
                   const svn::Revision &startr = svn::Revision(1),
                   const svn::Revision &endr = svn::Revision::HEAD);
     void makeLog(const svn::Revision &start, const svn::Revision &end, const svn::Revision &peg, const QString &, bool follow, bool list_files = false, int limit = 0);
-    svn::LogEntriesMapPtr getLog(const svn::Revision &start, const svn::Revision &end, const svn::Revision &peg, const QString &, bool list_files, int limit, QWidget *parent = 0);
-    svn::LogEntriesMapPtr getLog(const svn::Revision &start, const svn::Revision &end, const svn::Revision &peg, const QString &, bool list_files, int limit, bool follow_nodes, QWidget *parent = 0);
-    virtual bool getSingleLog(svn::LogEntry &, const svn::Revision &, const QString &, const svn::Revision &, QString &root);
+    svn::LogEntriesMapPtr getLog(const svn::Revision &start, const svn::Revision &end, const svn::Revision &peg, const QString &, bool list_files, int limit, QWidget *parent = nullptr);
+    svn::LogEntriesMapPtr getLog(const svn::Revision &start, const svn::Revision &end, const svn::Revision &peg, const QString &, bool list_files, int limit, bool follow_nodes, QWidget *parent = nullptr);
+    bool getSingleLog(svn::LogEntry &, const svn::Revision &, const QString &, const svn::Revision &, QString &root) override;
 
     void makeBlame(const svn::Revision &start, const svn::Revision &end, SvnItem *k);
-    void makeBlame(const svn::Revision &start, const svn::Revision &end, const QString &, QWidget *parent = 0, const svn::Revision &peg = svn::Revision::UNDEFINED, SimpleLogCb *_acb = 0);
+    void makeBlame(const svn::Revision &start, const svn::Revision &end, const QString &, QWidget *parent = nullptr, const svn::Revision &peg = svn::Revision::UNDEFINED, SimpleLogCb *_acb = nullptr);
     void makeUpdate(const svn::Targets &targets, const svn::Revision &rev, svn::Depth depth);
     bool makeSwitch(const QUrl &rUrl, const QString &tPath, const svn::Revision &r, svn::Depth depth, const svn::Revision &peg, bool stickydepth, bool ignore_externals, bool allow_unversioned);
     bool makeSwitch(const QString &path, const QUrl &what);
@@ -173,7 +173,7 @@ public:
     void clearContextData();
     QString getContextData(const QString &)const;
 
-    bool threadRunning(ThreadType which);
+    bool threadRunning(ThreadType which) const;
 
     bool doNetworking();
     virtual void doCommit(const SvnItemList &);
@@ -231,13 +231,13 @@ Q_SIGNALS:
     void sigRefreshAll();
     void sigThreadsChanged();
     void sigRefreshCurrent(SvnItem *);
-    void sigRefreshIcons();
     void sigExtraLogMsg(const QString &);
     void sigGotourl(const QUrl &);
     void sigCacheStatus(qlonglong, qlonglong);
     void sigCacheDataChanged();
     void sigItemsReverted(const QStringList &);
     void sigExtraStatusMessage(const QString &);
+    void sigRefreshItem(const QString &path);
 
 protected Q_SLOTS:
     virtual void checkModifiedThread();

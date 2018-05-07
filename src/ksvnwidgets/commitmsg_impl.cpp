@@ -54,26 +54,26 @@ Commitmsg_impl::Commitmsg_impl(QWidget *parent)
     : QWidget(parent), CommitMessage()
 {
     setupUi(this);
-    m_CurrentModel = 0;
-    m_SortModel = 0;
+    m_CurrentModel = nullptr;
+    m_SortModel = nullptr;
     m_LogEdit->setFocus();
     m_Reviewlabel->hide();
     m_hidden = true;
     hideButtons(true);
     m_MainSplitter->insertWidget(0, m_EditFrame);
     delete m_ReviewFrame;
-    m_Reviewlabel = 0;
-    m_MarkUnversioned = 0;
-    m_UnmarkUnversioned = 0;
-    m_DiffItem = 0;
+    m_Reviewlabel = nullptr;
+    m_MarkUnversioned = nullptr;
+    m_UnmarkUnversioned = nullptr;
+    m_DiffItem = nullptr;
 }
 
 Commitmsg_impl::Commitmsg_impl(const svn::CommitItemList &_items, QWidget *parent)
     : QWidget(parent), CommitMessage()
 {
     setupUi(this);
-    m_CurrentModel = 0;
-    m_SortModel = 0;
+    m_CurrentModel = nullptr;
+    m_SortModel = nullptr;
     m_LogEdit->setFocus();
     hideButtons(true);
     if (!_items.isEmpty()) {
@@ -94,8 +94,8 @@ Commitmsg_impl::Commitmsg_impl(const CommitActionEntries &_activatedList,
     : QWidget(parent), CommitMessage()
 {
     setupUi(this);
-    m_CurrentModel = 0;
-    m_SortModel = 0;
+    m_CurrentModel = nullptr;
+    m_SortModel = nullptr;
     m_LogEdit->setFocus();
     m_hidden = false;
 
@@ -290,7 +290,7 @@ QString Commitmsg_impl::getLogmessageInternal(Commitmsg_impl *ptr, bool *ok, svn
     QString msg;
 
     QPointer<KSvnSimpleOkDialog> dlg(new KSvnSimpleOkDialog(QStringLiteral("logmsg_dlg_size"), parent));
-    dlg->setWindowTitle(i18n("Commit log"));
+    dlg->setWindowTitle(i18nc("@title:window", "Commit Log"));
     dlg->setWithCancelButton();
     dlg->addWidget(ptr);
 
@@ -479,12 +479,12 @@ void Commitmsg_impl::insertFile(const QString &fname)
 
 void Commitmsg_impl::insertFile()
 {
-    QString head = i18n("Select text file for insert");
-    QPointer<KUrlRequesterDialog> dlg(new KUrlRequesterDialog(QUrl(), head, this));
-    dlg->setWindowTitle(head);
+    QString windowTitle = i18nc("@title:window", "Select Text File to Insert");
+    QPointer<KUrlRequesterDialog> dlg(new KUrlRequesterDialog(QUrl(), i18n("Select text file to insert:"), this));
+    dlg->setWindowTitle(windowTitle);
     KFile::Mode mode = static_cast<KFile::Mode>(KFile::File);
     dlg->urlRequester()->setMode(mode);
-    dlg->urlRequester()->setWindowTitle(head);
+    dlg->urlRequester()->setWindowTitle(windowTitle);
 
     if (dlg->exec() != QDialog::Accepted) {
         delete dlg;

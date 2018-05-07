@@ -49,8 +49,8 @@ SvnLogDlgImp::SvnLogDlgImp(SvnActions *ac, bool modal, QWidget *parent)
     m_DispPrevButton->setIcon(QIcon::fromTheme(QStringLiteral("kdesvndiff")));
     m_DispSpecDiff->setIcon(QIcon::fromTheme(QStringLiteral("kdesvndiff")));
     buttonBlame->setIcon(QIcon::fromTheme(QStringLiteral("kdesvnblame")));
-    m_SortModel = 0;
-    m_CurrentModel = 0;
+    m_SortModel = nullptr;
+    m_CurrentModel = nullptr;
     m_ControlKeyDown = false;
 
     if (Kdesvnsettings::self()->log_always_list_changed_files()) {
@@ -106,9 +106,9 @@ void SvnLogDlgImp::dispLog(const svn::LogEntriesMapPtr &log, const QString &what
     _base = root;
     m_Entries = log;
     if (!what.isEmpty()) {
-        setWindowTitle(i18n("SVN Log of %1", what));
+        setWindowTitle(i18nc("@title:window", "SVN Log of %1", what));
     } else {
-        setWindowTitle(i18n("SVN Log"));
+        setWindowTitle(i18nc("@title:window", "SVN Log"));
     }
     _name = what;
     if (!_name.startsWith(QLatin1Char('/'))) {

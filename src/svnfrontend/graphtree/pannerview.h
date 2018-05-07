@@ -32,8 +32,8 @@ class PannerView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    explicit PannerView(QWidget *parent = 0);
-    virtual ~PannerView();
+    explicit PannerView(QWidget *parent = nullptr);
+    ~PannerView();
 
     void setZoomRect(const QRectF &theValue);
     void updateCurrentRect();
@@ -44,9 +44,9 @@ signals:
     void zoomRectMoveFinished();
 
 protected:
-    virtual void mousePressEvent(QMouseEvent *);
-    virtual void mouseMoveEvent(QMouseEvent *);
-    virtual void mouseReleaseEvent(QMouseEvent *);
+    void mousePressEvent(QMouseEvent *) override;
+    void mouseMoveEvent(QMouseEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
 
 protected:
     QRectF m_ZoomRect;

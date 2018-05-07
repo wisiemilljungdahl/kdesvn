@@ -30,8 +30,8 @@ class DiffBrowser : public QTextBrowser
     Q_OBJECT
 
 public:
-    explicit DiffBrowser(QWidget *parent = 0);
-    virtual ~DiffBrowser();
+    explicit DiffBrowser(QWidget *parent = nullptr);
+    ~DiffBrowser();
 
 public slots:
     void setText(const QByteArray &ex);

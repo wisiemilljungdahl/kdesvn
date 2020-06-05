@@ -23,7 +23,6 @@
 #include <KLocalizedString>
 #include <KRun>
 #include <QAction>
-#include <QApplication>
 
 OpenContextmenu::OpenContextmenu(const QUrl &aPath, const KService::List &aList, QWidget *parent)
     : QMenu(parent)
@@ -41,25 +40,23 @@ void OpenContextmenu::setup()
 {
     m_mapPopup.clear();
     QStringList _found;
-    Q_FOREACH(const KService::Ptr &ptr, m_List) {
+    for (const KService::Ptr &ptr : qAsConst(m_List)) {
         if (_found.contains(ptr->name())) {
             continue;
         }
         _found.append(ptr->name());
         QString actionName(ptr->name().replace(QLatin1Char('&'), QLatin1String("&&")));
-        QAction *act = addAction(SmallIcon(ptr->icon()), actionName);
-        QVariant _data = m_mapPopup.size();
-        act->setData(_data);
+        QAction *act = addAction(QIcon::fromTheme(ptr->icon()), actionName);
+        act->setData(m_mapPopup.size());
 
         m_mapPopup.push_back(ptr);
     }
-    connect(this, SIGNAL(triggered(QAction*)), this, SLOT(slotRunService(QAction*)));
+    connect(this, &QMenu::triggered, this, &OpenContextmenu::slotRunService);
     if (!m_List.isEmpty()) {
         addSeparator();
     }
     QAction *act = new QAction(i18n("Other..."), this);
-    QVariant _data = int(0);
-    act->setData(_data);
+    act->setData(-1);
     addAction(act);
 }
 
@@ -67,7 +64,7 @@ void OpenContextmenu::slotRunService(QAction *act)
 {
     const int idx = act->data().toInt();
     if (idx >= 0 && idx < m_mapPopup.size()) {
-        KRun::runService(*m_mapPopup.at(idx), QList<QUrl>() << m_Path, QApplication::activeWindow());
+        KRun::runService(*m_mapPopup.at(idx), {m_Path}, parentWidget());
     } else {
         slotOpenWith();
     }
@@ -78,5 +75,5 @@ void OpenContextmenu::slotOpenWith()
 {
     QList<QUrl> lst;
     lst.append(m_Path);
-    KRun::displayOpenWithDialog(lst, QApplication::activeWindow());
+    KRun::displayOpenWithDialog({m_Path}, parentWidget());
 }

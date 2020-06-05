@@ -1,6 +1,5 @@
 ####
  #   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        #
- #   http://kdesvn.alwins-world.de/                                        #
  #                                                                         #
  #   This program is free software; you can redistribute it and/or modify  #
  #   it under the terms of the GNU General Public License as published by  #
@@ -106,6 +105,7 @@ install(TARGETS kdesvn kdesvnaskpass kdesvnpart
 # the resources
 install(FILES kdesvnui.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/kdesvn)
 install(FILES kdesvn_part.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/kdesvn)
-install(FILES org.kde.kdesvn.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES org.kde.kdesvn.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
+install(FILES org.kde.kdesvn.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
 install(FILES kdesvnpart.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
 install(FILES kdesvn.notifyrc DESTINATION ${DATA_INSTALL_DIR}/kdesvn)

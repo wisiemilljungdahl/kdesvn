@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2007 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -31,12 +31,11 @@ class QTreeWidget;
 
 typedef QSharedPointer<SvnLogModelNode> SvnLogModelNodePtr;
 
-class SvnLogModel: public QAbstractListModel
+class SvnLogModel final : public QAbstractListModel
 {
     Q_OBJECT
 public:
     SvnLogModel(const svn::LogEntriesMapPtr &_log, const QString &_name, QObject *parent);
-    ~SvnLogModel();
     void setLogData(const svn::LogEntriesMapPtr &log, const QString &name);
 
     qlonglong toRevision(const QModelIndex &)const;
@@ -52,14 +51,14 @@ public:
         Count
     };
 
-    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
-    int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-    int columnCount(const QModelIndex &) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    int columnCount(const QModelIndex &idx = QModelIndex()) const override;
 
     SvnLogModelNodePtr indexNode(const QModelIndex &)const;
-    int leftRow()const;
-    int rightRow()const;
+    int leftRow() const;
+    int rightRow() const;
     void setLeftRow(int);
     void setRightRow(int);
 
@@ -76,18 +75,17 @@ private:
     friend class SvnLogSortModel;
 };
 
-class SvnLogSortModel : public QSortFilterProxyModel
+class SvnLogSortModel final : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    SvnLogSortModel(QObject *parent = nullptr);
-    ~SvnLogSortModel();
+    using QSortFilterProxyModel::QSortFilterProxyModel;
 
-    void setSourceModel(QAbstractItemModel *sourceModel) final;
+    void setSourceModel(QAbstractItemModel *sourceModel) override final;
 protected:
-    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const final;
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override final;
 private:
-    SvnLogModel *m_sourceModel;
+    SvnLogModel *m_sourceModel = nullptr;
 };
 
 #endif

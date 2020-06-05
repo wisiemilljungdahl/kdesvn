@@ -1,6 +1,5 @@
 ####
  #   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        #
- #   http://kdesvn.alwins-world.de/                                        #
  #                                                                         #
  #   This program is free software; you can redistribute it and/or modify  #
  #   it under the terms of the GNU General Public License as published by  #
@@ -113,6 +112,11 @@ target_include_directories(svnqt
 )
 set_property(TARGET svnqt APPEND PROPERTY COMPILE_FLAGS ${APR_CPP_FLAGS})
 set_property(TARGET svnqt PROPERTY CXX_VISIBILITY_PRESET hidden)
+
+if(Backtrace_FOUND)
+     target_include_directories(svnqt PUBLIC SYSTEM ${Backtrace_INCLUDE_DIRS})
+     target_link_libraries(svnqt PUBLIC ${Backtrace_LIBRARY})
+endif()
 
 if(WIN32)
     target_link_libraries(svnqt wsock32.lib)

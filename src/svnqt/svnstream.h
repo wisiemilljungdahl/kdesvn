@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 #ifndef SVNSVNSTREAM_HPP
 #define SVNSVNSTREAM_HPP
@@ -60,7 +60,7 @@ public:
      * \param ctx a client context for calls to cancel_func inside. you should this only set with functions not using it itself
      * like svn_client_cat2:
      */
-    explicit SvnStream(bool readit, bool writeit, svn_client_ctx_t *ctx = 0);
+    explicit SvnStream(bool readit, bool writeit, svn_client_ctx_t *ctx = nullptr);
     //! frees all structures and releases memory pool.
     virtual ~SvnStream();
 
@@ -132,7 +132,7 @@ public:
      * \param ctx a client context for calls to cancel_func inside. you should this only set with functions not using it itself
      * like svn_client_cat2:
      */
-    explicit SvnByteStream(svn_client_ctx_t *ctx = 0);
+    explicit SvnByteStream(svn_client_ctx_t *ctx = nullptr);
     //! release internal buffer
     ~SvnByteStream();
     //! fill internal buffer with data

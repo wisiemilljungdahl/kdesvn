@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -61,7 +61,7 @@ apr_time_t
 DateTime::GetAPRTimeT() const
 {
     apr_time_t aTime;
-    apr_time_ansi_put(&aTime, m_time.toTime_t());
+    apr_time_ansi_put(&aTime, m_time.toSecsSinceEpoch());
     return aTime;
 }
 
@@ -75,12 +75,12 @@ DateTime::SetRFC822Date(const char *date)
 
 void DateTime::setAprTime(apr_time_t aTime)
 {
-    m_time.setTimeSpec(Qt::LocalTime);
     if (aTime < 0) {
-        m_time.setTime_t(0);
+        m_time = QDateTime();
     } else {
-        m_time.setTime_t(aTime / (1000 * 1000));
+        m_time = QDateTime::fromMSecsSinceEpoch(aTime / 1000);  // microsec -> millisec
     }
+    m_time.setTimeSpec(Qt::LocalTime);
 }
 
 QString DateTime::toString(const QString &format)const

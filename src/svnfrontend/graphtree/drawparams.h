@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -125,41 +125,41 @@ public:
                               bool current = false);
 
     // getters
-    QString  text(int) const;
-    QPixmap  pixmap(int) const;
-    Position position(int) const;
-    int      maxLines(int) const;
-    int      fieldCount() const
+    QString  text(int) const override;
+    QPixmap  pixmap(int) const override;
+    Position position(int) const override;
+    int      maxLines(int) const override;
+    int      fieldCount() const override
     {
         return _field.size();
     }
 
-    QColor   backColor() const
+    QColor   backColor() const override
     {
         return _backColor;
     }
-    bool selected() const
+    bool selected() const override
     {
         return _selected;
     }
-    bool current() const
+    bool current() const override
     {
         return _current;
     }
-    bool shaded() const
+    bool shaded() const override
     {
         return _shaded;
     }
-    bool rotated() const
+    bool rotated() const override
     {
         return _rotated;
     }
-    bool drawFrame() const
+    bool drawFrame() const override
     {
         return _drawFrame;
     }
 
-    QFont font() const;
+    QFont font() const override;
 
     // attribute setters
     void setField(int f, const QString &t, const QPixmap &pm = QPixmap(),
@@ -208,11 +208,11 @@ private:
     struct Field {
         QString text;
         QPixmap pix;
-        Position pos;
-        int maxLines;
+        Position pos = Unknown;
+        int maxLines = 0;
     };
 
-    QList<Field> _field;
+    QVector<Field> _field;
 };
 
 /* State for drawing on a rectangle.
@@ -236,18 +236,18 @@ public:
     void setDrawParams(DrawParams *);
 
     // draw on a given QPainter, use this class as info provider per default
-    void drawBack(QPainter *, DrawParams *dp = 0);
+    void drawBack(QPainter *, DrawParams *dp = nullptr);
     /* Draw field at position() from pixmap()/text() with maxLines().
      * Returns true if something was drawn
      */
-    bool drawField(QPainter *, int f, DrawParams *dp = 0);
+    bool drawField(QPainter *, int f, DrawParams *dp = nullptr);
 
     // resets rectangle for free space
     void setRect(QRect);
 
     // Returns the rectangle area still free of text/pixmaps after
     // a number of drawText() calls.
-    QRect remainingRect(DrawParams *dp = 0);
+    QRect remainingRect(DrawParams *dp = nullptr);
 
 private:
     int _usedTopLeft, _usedTopCenter, _usedTopRight;

@@ -25,8 +25,7 @@
 #include "commitmodelhelper.h"
 #include "svnqt/svnqttypes.h"
 
-#include <QAbstractListModel>
-#include <QScopedPointer>
+#include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
 
 class CommitModel: public QAbstractItemModel
@@ -38,8 +37,6 @@ protected:
 public:
     explicit CommitModel(const svn::CommitItemList &, QObject *parent = nullptr);
     void setCommitData(const svn::CommitItemList &);
-
-    ~CommitModel();
 
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex())const override;
     QModelIndex parent(const QModelIndex &)const override;
@@ -63,36 +60,34 @@ protected:
     CommitModelNodeList m_List;
 };
 
-class CommitModelCheckitem: public CommitModel
+class CommitModelCheckitem : public CommitModel
 {
     Q_OBJECT
 public:
     CommitModelCheckitem(const CommitActionEntries &, const CommitActionEntries &, QObject *parent = nullptr);
-    ~CommitModelCheckitem();
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant data(const QModelIndex &index, int role) const override;
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    int ActionColumn()const override;
-    int ItemColumn()const override;
+    int ActionColumn() const override;
+    int ItemColumn() const override;
 
 };
 
-class CommitFilterModel : public QSortFilterProxyModel
+class CommitFilterModel final : public QSortFilterProxyModel
 {
     Q_OBJECT
  public:
-    explicit CommitFilterModel(QObject *parent);
-    ~CommitFilterModel();
+    using QSortFilterProxyModel::QSortFilterProxyModel;
 
     void setSourceModel(QAbstractItemModel *sourceModel) override;
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
-
     void hideItems(bool bHide, CommitActionEntry::ACTION_TYPE aType);
+protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 private:
-    CommitModel *m_sourceModel;
-    CommitActionEntry::ActionTypes m_visibleTypes;
+    CommitModel *m_sourceModel = nullptr;
+    CommitActionEntry::ActionTypes m_visibleTypes = CommitActionEntry::ALL;
 };
 
 #endif

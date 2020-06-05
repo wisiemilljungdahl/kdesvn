@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -70,45 +70,22 @@ Targets::Targets(const Path &target)
 apr_array_header_t *
 Targets::array(const Pool &pool) const
 {
-    Paths::const_iterator it;
-
     apr_pool_t *apr_pool = pool.pool();
     apr_array_header_t *apr_targets =
         apr_array_make(apr_pool,
                        m_targets.size(),
                        sizeof(const char *));
 
-    for (it = m_targets.begin(); it != m_targets.end(); ++it) {
-        QByteArray s = (*it).path().toUtf8();
-
-        char *t2 =
-            apr_pstrndup(apr_pool, s, s.size());
-
+    for (const svn::Path &tgt : m_targets) {
+        const QByteArray s = tgt.path().toUtf8();
+        char *t2 = apr_pstrndup(apr_pool, s.data(), s.size());
         (*((const char **) apr_array_push(apr_targets))) = t2;
     }
 
     return apr_targets;
 }
 
-const Paths &
-Targets::targets() const
-{
-    return m_targets;
-}
-
-size_t
-Targets::size() const
-{
-    return m_targets.size();
-}
-
-const Path &Targets::operator [](size_t which)const
-{
-    return m_targets[which];
-}
-
-const Path
-Targets::target(Paths::size_type which) const
+const Path Targets::target(Paths::size_type which) const
 {
     if (m_targets.size() > which) {
         return m_targets[which];
@@ -121,9 +98,8 @@ svn::Targets Targets::fromStringList(const QStringList &paths)
 {
     svn::Paths ret;
     ret.reserve(paths.size());
-    Q_FOREACH(const QString &path, paths) {
+    for (const QString &path : paths)
         ret.push_back(svn::Path(path));
-    }
     return svn::Targets(ret);
 }
 
@@ -132,9 +108,8 @@ svn::Targets Targets::fromUrlList(const QList<QUrl> &urls, UrlConversion convers
     svn::Paths ret;
     ret.reserve(urls.size());
     const bool preferLocalFile = conversion == UrlConversion::PreferLocalPath;
-    Q_FOREACH(const QUrl &url, urls) {
+    for (const QUrl &url : urls)
         ret.push_back(svn::Path((preferLocalFile && url.isLocalFile()) ? url.toLocalFile() : url.url()));
-    }
     return svn::Targets(ret);
 }
 

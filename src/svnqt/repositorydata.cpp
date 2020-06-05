@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 #include "svnqt/repositorydata.h"
 #include "svnqt/svnqt_defines.h"
@@ -47,7 +47,7 @@ class SVNQT_NOEXPORT RepoOutStream: public stream::SvnStream
 public:
     RepoOutStream(RepositoryData *);
 
-    bool isOk()const override
+    bool isOk() const override
     {
         return true;
     }

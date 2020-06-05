@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -64,7 +64,7 @@ public:
      *
      * @param src another entry to copy from
      */
-    explicit Entry(const svn_client_status_t *src = 0);
+    explicit Entry(const svn_client_status_t *src = nullptr);
 
     /**
      * copy constructor

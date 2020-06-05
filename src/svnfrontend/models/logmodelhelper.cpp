@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2007 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -64,8 +64,7 @@ const svn::LogChangePathEntries &SvnLogModelNode::changedPaths()const
 
 bool SvnLogModelNode::copiedFrom(QString &_n, qlonglong &_rev)const
 {
-    for (int i = 0; i < _data.changedPaths.count(); ++i) {
-        const svn::LogChangePathEntry &entry =_data.changedPaths.at(i);
+    for (const svn::LogChangePathEntry &entry : _data.changedPaths) {
         if (entry.action == 'A' &&
                 !entry.copyFromPath.isEmpty() &&
                 isParent(entry.path, _realName)) {

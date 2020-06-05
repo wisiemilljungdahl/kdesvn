@@ -23,7 +23,7 @@
 #include "svnfrontend/fronthelpers/cursorstack.h"
 
 #include <QDialog>
-#include <QTime>
+#include <QElapsedTimer>
 
 class QDialogButtonBox;
 class QTimer;
@@ -33,6 +33,7 @@ class QTextBrowser;
 class QHideEvent;
 class QShowEvent;
 class QVBoxLayout;
+class CContextListener;
 
 /**
 @author Rajko Albrecht
@@ -41,11 +42,10 @@ class StopDlg : public QDialog
 {
     Q_OBJECT
 public:
-    StopDlg(QObject *listener, QWidget *parent, const QString &caption, const QString &text);
+    StopDlg(CContextListener *listener, QWidget *parent, const QString &caption, const QString &text);
     ~StopDlg();
 
 protected:
-    QObject *m_Context;
     int m_MinDuration;
     bool mCancelled;
     QTimer *mShowTimer;
@@ -55,7 +55,7 @@ protected:
     QProgressBar *m_NetBar;
     bool m_BarShown;
     bool m_netBarShown;
-    QTime m_StopTick;
+    QElapsedTimer m_StopTick;
     QTextBrowser *m_LogWindow;
     QVBoxLayout *layout, *mainLayout;
 

@@ -40,47 +40,52 @@ CommitModel::CommitModel(const CommitActionEntries &_checked, const CommitAction
     setCommitData(_checked, _notchecked);
 }
 
-CommitModel::~CommitModel()
-{
-}
-
 void CommitModel::setCommitData(const svn::CommitItemList &aList)
 {
-    beginRemoveRows(QModelIndex(), 0, m_List.count());
-    m_List.clear();
-    endRemoveRows();
-
-    m_List.reserve(aList.size());
-    beginInsertRows(QModelIndex(), 0, aList.size() - 1);
-    for (int j = 0; j < aList.size(); ++j) {
-        m_List.append(CommitModelNodePtr(new CommitModelNode(aList[j])));
+    if (!m_List.isEmpty()) {
+        beginRemoveRows(QModelIndex(), 0, m_List.count() - 1);
+        m_List.clear();
+        endRemoveRows();
     }
-    endInsertRows();
+
+    if (!aList.isEmpty()) {
+        m_List.reserve(aList.size());
+        beginInsertRows(QModelIndex(), 0, aList.size() - 1);
+        for (const auto &item : aList) {
+            m_List.append(CommitModelNodePtr(new CommitModelNode(item)));
+        }
+        endInsertRows();
+    }
 }
 
 void CommitModel::setCommitData(const CommitActionEntries &checked, const CommitActionEntries &notchecked)
 {
-    beginRemoveRows(QModelIndex(), 0, m_List.count());
-    m_List.clear();
-    endRemoveRows();
+    if (!m_List.isEmpty()) {
+        beginRemoveRows(QModelIndex(), 0, m_List.count() - 1);
+        m_List.clear();
+        endRemoveRows();
+    }
 
-    m_List.reserve(checked.size() + notchecked.size());
-    beginInsertRows(QModelIndex(), 0, checked.size() + notchecked.size() - 1);
-    for (int j = 0; j < checked.size(); ++j) {
-        m_List.append(CommitModelNodePtr(new CommitModelNode(checked[j], true)));
+    const int totalSize = checked.size() + notchecked.size();
+    if (totalSize > 0) {
+        m_List.reserve(totalSize);
+        beginInsertRows(QModelIndex(), 0, totalSize - 1);
+        for (const auto &entry : checked) {
+            m_List.append(CommitModelNodePtr(new CommitModelNode(entry, true)));
+        }
+        for (const auto &entry : notchecked) {
+            m_List.append(CommitModelNodePtr(new CommitModelNode(entry, false)));
+        }
+        endInsertRows();
     }
-    for (int j = 0; j < notchecked.size(); ++j) {
-        m_List.append(CommitModelNodePtr(new CommitModelNode(notchecked[j], false)));
-    }
-    endInsertRows();
 }
 
-int CommitModel::ActionColumn()const
+int CommitModel::ActionColumn() const
 {
     return 0;
 }
 
-int CommitModel::ItemColumn()const
+int CommitModel::ItemColumn() const
 {
     return 1;
 }
@@ -93,12 +98,12 @@ CommitModelNodePtr CommitModel::node(const QModelIndex &index)
     return m_List.at(index.row());
 }
 
-CommitActionEntries CommitModel::checkedEntries()const
+CommitActionEntries CommitModel::checkedEntries() const
 {
     CommitActionEntries res;
-    for (int i = 0; i < m_List.count(); ++i) {
-        if (m_List.at(i)->checked()) {
-            res.append(m_List.at(i)->actionEntry());
+    for (const auto &entry : m_List) {
+        if (entry->checked()) {
+            res.append(entry->actionEntry());
         }
     }
     return res;
@@ -106,12 +111,11 @@ CommitActionEntries CommitModel::checkedEntries()const
 
 void CommitModel::markItems(bool mark, CommitActionEntry::ACTION_TYPE _type)
 {
-    QVariant v = mark ? int(2) : int(0);
+    QVariant v = mark ? int(Qt::Checked) : int(Qt::Unchecked);
     for (int i = 0; i < m_List.count(); ++i) {
         if (m_List.at(i)->actionEntry().type() & _type) {
             QModelIndex _index = index(i, 0, QModelIndex());
             setData(_index, v, Qt::CheckStateRole);
-            dataChanged(_index, _index);
         }
     }
 }
@@ -218,16 +222,12 @@ CommitModelCheckitem::CommitModelCheckitem(const CommitActionEntries &_checked, 
 {
 }
 
-CommitModelCheckitem::~CommitModelCheckitem()
-{
-}
-
-int CommitModelCheckitem::ActionColumn()const
+int CommitModelCheckitem::ActionColumn() const
 {
     return 1;
 }
 
-int CommitModelCheckitem::ItemColumn()const
+int CommitModelCheckitem::ItemColumn() const
 {
     return 0;
 }
@@ -262,7 +262,7 @@ bool CommitModelCheckitem::setData(const QModelIndex &index, const QVariant &val
         bool nv = value.toInt() > 0;
         _l->setChecked(nv);
         if (old != nv) {
-            emit dataChanged(index, index);
+            emit dataChanged(index, index, {Qt::CheckStateRole});
         }
         return old != nv;
     }
@@ -275,15 +275,6 @@ bool CommitModelCheckitem::setData(const QModelIndex &index, const QVariant &val
 /***************************
  * Begin CommitFilterModel *
  ***************************/
-CommitFilterModel::CommitFilterModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
-    , m_sourceModel(nullptr)
-    , m_visibleTypes(CommitActionEntry::ALL)
-{}
-
-CommitFilterModel::~CommitFilterModel()
-{}
-
 void CommitFilterModel::setSourceModel(QAbstractItemModel *sourceModel)
 {
     m_sourceModel = qobject_cast<CommitModel*>(sourceModel);

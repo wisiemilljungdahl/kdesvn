@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -169,12 +169,12 @@ char SvnItemModelNodeDir::sortChar() const
 
 SvnItemModelNode *SvnItemModelNodeDir::findPath(const QVector<QStringRef> &parts)
 {
-    for (int i = 0; i < m_Children.size(); ++i) {
-        if (m_Children[i]->shortName() == parts[0]) {
+    for (auto &child : m_Children) {
+        if (child->shortName() == parts[0]) {
             if (parts.size() == 1) {
-                return m_Children[i];
-            } else if (m_Children[i]->isDir()) {
-                return static_cast<SvnItemModelNodeDir *>(m_Children[i])->findPath(parts.mid(1));
+                return child;
+            } else if (child->isDir()) {
+                return static_cast<SvnItemModelNodeDir *>(child)->findPath(parts.mid(1));
             }
         }
     }
@@ -203,8 +203,8 @@ void SvnItemModelNodeDir::refreshStatus(bool children)
         return;
     }
     if (children) {
-        for (int i = 0; i < m_Children.size(); ++i) {
-            m_Children[i]->refreshStatus(children);
+        for (auto &child : m_Children) {
+            child->refreshStatus(children);
         }
     }
 }

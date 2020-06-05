@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>org.kde.kdesvn.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>kdesvn</name>
+  <name xml:lang="ca">kdesvn</name>
+  <name xml:lang="ca-valencia">kdesvn</name>
+  <name xml:lang="cs">kdesvn</name>
+  <name xml:lang="de">kdesvn</name>
+  <name xml:lang="en-GB">kdesvn</name>
+  <name xml:lang="es">kdesvn</name>
+  <name xml:lang="et">kdesvn</name>
+  <name xml:lang="eu">kdesvn</name>
+  <name xml:lang="fr">kdesvn</name>
+  <name xml:lang="gl">kdesvn</name>
+  <name xml:lang="id">kdesvn</name>
+  <name xml:lang="it">kdesvn</name>
+  <name xml:lang="ko">kdesvn</name>
+  <name xml:lang="nl">kdesvn</name>
+  <name xml:lang="nn">kdesvn</name>
+  <name xml:lang="pl">kdesvn</name>
+  <name xml:lang="pt">kdesvn</name>
+  <name xml:lang="pt-BR">kdesvn</name>
+  <name xml:lang="ru">kdesvn</name>
+  <name xml:lang="sk">kdesvn</name>
+  <name xml:lang="sv">kdesvn</name>
+  <name xml:lang="uk">kdesvn</name>
+  <name xml:lang="x-test">xxkdesvnxx</name>
+  <summary>Subversion Revision Control</summary>
+  <summary xml:lang="ca">Control de revisió del Subversion</summary>
+  <summary xml:lang="ca-valencia">Control de revisió del Subversion</summary>
+  <summary xml:lang="de">Subversion-Revisionsverwaltung</summary>
+  <summary xml:lang="en-GB">Subversion Revision Control</summary>
+  <summary xml:lang="es">Control de revisiones de Subversion</summary>
+  <summary xml:lang="et">Subversioni versioonihaldus</summary>
+  <summary xml:lang="eu">Subversion berrikuspen kontrola</summary>
+  <summary xml:lang="fr">Gestion de versions Subversion</summary>
+  <summary xml:lang="gl">Control de revisións de Subversion</summary>
+  <summary xml:lang="id">Kendali Revisi Subversi</summary>
+  <summary xml:lang="it">Controllo di revisione Subversion</summary>
+  <summary xml:lang="ko">Subversion 리비전 관리</summary>
+  <summary xml:lang="nl">Besturing van revisies met Subversion</summary>
+  <summary xml:lang="nn">Subversion versjonskontroll</summary>
+  <summary xml:lang="pl">Zarządzanie wersjami Subversion</summary>
+  <summary xml:lang="pt">Controlo de Versões Subversion</summary>
+  <summary xml:lang="pt-BR">Controle de revisões Subversion</summary>
+  <summary xml:lang="sk">Správa revízií Subversion</summary>
+  <summary xml:lang="sv">Subversion versionskontroll</summary>
+  <summary xml:lang="uk">Керування версіями Subversion</summary>
+  <summary xml:lang="x-test">xxSubversion Revision Controlxx</summary>
+  <description>
+    <p>
+        kdesvn is a Subversion client using the native Subversion development 
+        API instead of just parsing the output of the commandline tool like most other 
+        clients do.
+    </p>
+    <p xml:lang="ca">El Kdesvn és un client de Subversion que utilitza l'API de desenvolupament nativa de Subversion en comptes d'analitzar la sortida de l'eina de línia d'ordres tal com ho fan la majoria d'altres clients.</p>
+    <p xml:lang="ca-valencia">El Kdesvn és un client de Subversion que utilitza l'API de desenvolupament nativa de Subversion en comptes d'analitzar l'eixida de l'eina de línia d'ordres tal com ho fan la majoria d'altres clients.</p>
+    <p xml:lang="de">kdesvn ist ein Dienstprogramm für Subversion und verwendet dessen native Entwicklungs-API statt nur die Ausgabe der Befehlszeile zu verarbeiten.</p>
+    <p xml:lang="en-GB">kdesvn is a Subversion client using the native Subversion development API instead of just parsing the output of the command line tool like most other clients do.</p>
+    <p xml:lang="es">kdesvn es un cliente de Subversion que usa la API de desarrollo nativa de Subversion en lugar de limitarse a analizar la salida de la herramienta de la línea de órdenes, como hacen la mayoría de clientes.</p>
+    <p xml:lang="et">kdesvn on Subversioni klient, mis kasutab Subversioni enda arendus-API-t selmet lihtsalt parsida käsureatööriista väljundit, nagu teeb enamik kliente.</p>
+    <p xml:lang="eu">kdesvn Subversion-eko garapenerako berezko APIa erabiltzen duen  Subversion-bezero bat da beste bezero gehienek aldiz komando-lerro  irteerakoa analizatu besterik ez dute egiten.</p>
+    <p xml:lang="fr">kdesvn est un client Subversion qui fait appel à l'API de développement native de Subversion au lieu d'analyser la sortie de l'outil en ligne de commande comme la majorité des autres clients.</p>
+    <p xml:lang="gl">kdesvn é un cliente de Subversion que usa a API nativa de desenvolvemento de Subversion en vez de analizar a saída da ferramenta da liña de ordes como fan a meirande parte do resto de clientes.</p>
+    <p xml:lang="id">kdesvn adalah sebuah klien Subversion yang menggunakan API pengembangan Subversion bawaan alih-alih hanya mengurai output dari alat baris-perintah seperti kebanyakan klien-klien lakukan.</p>
+    <p xml:lang="it">kdesvn è un client di Subversion che usa l'API di sviluppo nativa di Subversion, invece di elaborare solamente l'output del relativo strumento a riga di comando come fa la maggior parte degli altri client.</p>
+    <p xml:lang="ko">kdesvn은 Subversion 클라이언트입니다. 네이티브 Subversion API를 사용하여 명령행 도구 출력을 처리하는 것 이상의 작업을 수행합니다.</p>
+    <p xml:lang="nl">kdesvn is een subversion-client met de inheemse Subversion development API in plaats van gewoon de uitvoer van het hulpmiddel voor de opdrachtregel te ontleden zoals de meeste andere clients doen.</p>
+    <p xml:lang="nn">kdesvn er ein Subversion-klient som brukar Subversion-API-et i staden for å berre prøva å tolka utdata frå kommandolinje­verktøy, slik dei fleste andre Subversion-klientar gjer.</p>
+    <p xml:lang="pl">kdesvn jest klientem Subversion, który używa natywnego API programistycznego Subversion zamiast przetwarzać wiersz poleceń, tak jak robią to inne klienty.</p>
+    <p xml:lang="pt">O Kdesvn é um cliente de Subversion que usa a API de desenvolvimento nativo do Subversion em vez de processar apenas o resultado da ferramenta da linha de comandos, como fazem os outros clientes.</p>
+    <p xml:lang="pt-BR">O kdesvn é um cliente do Subversion que usa a API de desenvolvimento nativa do Subversion ao invés de apenas analisar a saída da ferramenta em linha de comando como a maioria dos demais clientes fazem.</p>
+    <p xml:lang="sk">kdesvn je klient pre Subversion, ktorý používa natívne vývojové API Subversion namiesto parsovania výstupu príkazového riadku, ako to robí väčšina iných nástrojov.</p>
+    <p xml:lang="sv">kdesvn är en Subversion-klient som använder det inbyggda utvecklingsprogrammeringsgränssnittet för Subversion istället för att bara tolka utdata från kommandoradsverktyget som de flesta andra klienter gör.</p>
+    <p xml:lang="uk">kdesvn — клієнт Subversion, який використовує природний програмний інтерфейс для розробки Subversion, а не просто обробляє дані, які виведено у відповідь на команди, як це робиться у більшості інших клієнтів.</p>
+    <p xml:lang="x-test">xxkdesvn is a Subversion client using the native Subversion development API instead of just parsing the output of the commandline tool like most other clients do.xx</p>
+    <p>
+        It tries to setup a look and feel like the standard filemanager of KDE and is
+        integrated into it via KPart.
+    </p>
+    <p xml:lang="ca">Intenta configurar un aspecte i comportament com el gestor de fitxers estàndard del KDE i està integrat en ell mitjançant una KPart.</p>
+    <p xml:lang="ca-valencia">Intenta configurar un aspecte i comportament com el gestor de fitxers estàndard del KDE i està integrat en ell mitjançant una KPart.</p>
+    <p xml:lang="de">Das Erscheinungsbild entspricht dem Standarddateiverwaltungsprogramm von KDE und ist als KPart darin integriert.</p>
+    <p xml:lang="en-GB">It tries to setup a look and feel like the standard file manager of KDE and is integrated into it via KPart.</p>
+    <p xml:lang="es">Intenta tener un aspecto y un comportamiento semejante al del gestor de archivos de KDE y se integra en él mediante KPart.</p>
+    <p xml:lang="et">Rakendus püüab välja näha ja käituda nagu KDE tavaline failihaldur ning on sellega lõimitud vastava komponendi kaudu.</p>
+    <p xml:lang="eu">KDEko fitxategi-kudeatzaile estandarraren itxura eta izaera antzekoa ezartzen  saiatzen da eta KPart bidez hartan bateratzen da.</p>
+    <p xml:lang="fr">Il essaie d'adopter une apparence similaire à celle du gestionnaire de fichiers standard de KDE et est intégré à celui-ci via KPart.</p>
+    <p xml:lang="gl">Intenta configurar unha aparencia e comportamento similar á do xestor de ficheiros de KDE e intégrase con el mediante KPart.</p>
+    <p xml:lang="id">Ini mencoba untuk menyiapkan sebuah nuansa dan suasana seperti pengelola-file standar KDE dan terintegrasi ke dalamnya via KPart.</p>
+    <p xml:lang="it">Cerca di mostrare un aspetto simile a quello del gestore di file standard di KDE, ed è integrato con esso tramite KPart.</p>
+    <p xml:lang="ko">KDE 파일 관리자에 KPart로 통합되어 표준 파일 관리자처럼 사용할 수 있습니다.</p>
+    <p xml:lang="nl">Het probeert een uiterlijk en gedrag in te stellen zoals de standaard bestandsbeheerder van KDE en is er in geïntegreerd via KPart.</p>
+    <p xml:lang="nn">Det er utforma som den vanlege KDE-filhandsamaren, og er integrert i han via KPart-teknologien.</p>
+    <p xml:lang="pl">Próbuje dać wrażenia wzrokowe i dotykowe takie jak w zwykłej przeglądarce plików KDE i jest z nią zintegrowany przy użyciu KPart.</p>
+    <p xml:lang="pt">Tenta configurar uma aparência e comportamento semelhante ao gestor de ficheiros do KDE e integra-se com o mesmo através de uma KPart.</p>
+    <p xml:lang="pt-BR">Ele tenta configurar um visual como o gerenciador de arquivos padrão do KDE e está integrado a ele através do KPart.</p>
+    <p xml:lang="sk">Pokúša sa nastaviť vzhľad ako štandardný súborový manažér pre KDE a je integrované cez KPart.</p>
+    <p xml:lang="sv">Den försöker skapa ett utseende och en känsla som den vanliga filhanteraren i KDE, och är integrerad med den via ett K-delprogram.</p>
+    <p xml:lang="uk">У програмі використано інтерфейс звичайної програми для керування файлами KDE, її інтегровано з рештою середовища за допомогою інтерфейсу KPart.</p>
+    <p xml:lang="x-test">xxIt tries to setup a look and feel like the standard filemanager of KDE and is integrated into it via KPart.xx</p>
+  </description>
+  <url type="homepage">https://www.kde.org</url>
+  <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=kdesvn</url>
+  <url type="help">https://docs.kde.org/trunk5/en/extragear-sdk/kdesvn/index.html</url>
+  <url type="donation">https://www.kde.org/community/donations/?app=kdesvn&amp;source=appdata</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://cdn.kde.org/screenshots/kdesvn/kdesvn.png</image>
+    </screenshot>
+  </screenshots>
+  <project_group>KDE</project_group>
+  <provides>
+    <binary>kdesvn</binary>
+  </provides>
+  <launchable type="desktop-id">org.kde.kdesvn.desktop</launchable>
+  <releases>
+    <release version="2.1" date="2019-07-10"/>
+    <release version="2.0" date="2016-12-10"/>
+  </releases>
+</component>

@@ -34,13 +34,7 @@
 #include <KUrlRequesterDialog>
 
 #include <QStringList>
-#include <QSortFilterProxyModel>
 #include <QTemporaryFile>
-#include <QCheckBox>
-#include <QLabel>
-#include <QLayout>
-#include <QWidget>
-#include <QPushButton>
 #include <QFile>
 
 #define MAX_MESSAGE_HISTORY 10
@@ -127,8 +121,8 @@ void Commitmsg_impl::setupModel()
     m_CommitItemTree->resizeColumnToContents(m_CurrentModel->ActionColumn());
 
     m_SortModel->setSortCaseSensitivity(Kdesvnsettings::case_sensitive_sort() ? Qt::CaseSensitive : Qt::CaseInsensitive);
-    connect(m_CommitItemTree->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            this, SLOT(slotCurrentItemChanged(QModelIndex)));
+    connect(m_CommitItemTree->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &Commitmsg_impl::slotCurrentItemChanged);
     slotCurrentItemChanged(QModelIndex()); // update pushbuttons
 }
 
@@ -213,11 +207,11 @@ void Commitmsg_impl::initHistory()
         }
     }
     QStringList::const_iterator it;
-    for (it = sLogHistory.constBegin(); it != sLogHistory.constEnd(); ++it) {
-        if ((*it).length() <= 40) {
-            m_LogHistory->addItem((*it));
+    for (const QString &historyEntry : qAsConst(sLogHistory)) {
+        if (historyEntry.length() <= 40) {
+            m_LogHistory->addItem(historyEntry);
         } else {
-            m_LogHistory->addItem((*it).left(37) + QStringLiteral("..."));
+            m_LogHistory->addItem(historyEntry.leftRef(37) + QStringLiteral("..."));
         }
     }
     if (!sLastMessage.isEmpty()) {
@@ -340,7 +334,7 @@ void Commitmsg_impl::addItemWidget(QWidget *aWidget)
     m_DepthSelector->addItemWidget(aWidget);
 }
 
-CommitActionEntries Commitmsg_impl::checkedEntries()
+CommitActionEntries Commitmsg_impl::checkedEntries() const
 {
     if (m_CurrentModel) {
         return m_CurrentModel->checkedEntries();

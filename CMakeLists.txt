@@ -1,6 +1,5 @@
 ####
  #   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        #
- #   http://kdesvn.alwins-world.de/                                        #
  #                                                                         #
  #   This program is free software; you can redistribute it and/or modify  #
  #   it under the terms of the GNU General Public License as published by  #
@@ -52,14 +51,14 @@ find_package(KF5 REQUIRED COMPONENTS
     Notifications Parts Service TextWidgets
     Wallet WidgetsAddons XmlGui
 )
-set(QT_MIN_VERSION 5.6.0)
-find_package(Qt5 REQUIRED COMPONENTS
+set(QT_MIN_VERSION 5.9.0)
+find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS
     Core DBus Gui Sql Widgets Xml
 )
 
 # Set the version
 set(KDESVN_VERSION_MAJOR 2)
-set(KDESVN_VERSION_MINOR 0)
+set(KDESVN_VERSION_MINOR 1)
 set(KDESVN_VERSION_PATCH 0)
 set(KDESVN_VERSION_STRING ${KDESVN_VERSION_MAJOR}.${KDESVN_VERSION_MINOR}.${KDESVN_VERSION_PATCH})
 
@@ -92,9 +91,12 @@ add_definitions(-DQT_NO_CAST_TO_ASCII)
 #add_definitions(-DQT_NO_CAST_FROM_ASCII)
 add_definitions(-DQT_RESTRICTED_CAST_FROM_ASCII)
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+# kde headers still use Q_FOREACH... :(
+# add_definitions(-DQT_NO_FOREACH)
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 add_definitions(-DQT_STRICT_ITERATORS)
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050600)
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050900)
+add_definitions(-DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT)
 
 # include(MacroEnsureVersion)
 include(FindSubversion)

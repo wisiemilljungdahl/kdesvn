@@ -101,8 +101,8 @@ CommandExec::CommandExec(QObject *parent)
     SshAgent ag;
     ag.querySshAgent();
 
-    connect(m_pCPart->m_SvnWrapper, SIGNAL(clientException(QString)), this, SLOT(clientException(QString)));
-    connect(m_pCPart->m_SvnWrapper, SIGNAL(sendNotify(QString)), this, SLOT(slotNotifyMessage(QString)));
+    connect(m_pCPart->m_SvnWrapper, &SvnActions::clientException, this, &CommandExec::clientException);
+    connect(m_pCPart->m_SvnWrapper, &SvnActions::sendNotify, this, &CommandExec::slotNotifyMessage);
     m_pCPart->m_SvnWrapper->reInitClient();
 }
 
@@ -274,9 +274,9 @@ int CommandExec::exec(const QCommandLineParser *parser)
             continue;
         }
         const QList<QPair<QString, QString> > q = QUrlQuery(tmpurl).queryItems();
-        for(int i = 0; i < q.size(); ++i) {
-            if (q.at(i).first == QLatin1String("rev")) {
-                svn::Revision re = q.at(i).second;
+        for (const auto &item : q) {
+            if (item.first == QLatin1String("rev")) {
+                svn::Revision re = item.second;
                 if (re) {
                     m_pCPart->extraRevisions[j - 2] = re;
                 }
@@ -500,7 +500,7 @@ void CommandExec::slotCmd_list()
     if (!m_pCPart->m_SvnWrapper->makeList(m_pCPart->urls.at(0), res, rev, svn::DepthInfinity)) {
         return;
     }
-    Q_FOREACH(const svn::DirEntry &entry, res) {
+    for (const svn::DirEntry &entry : qAsConst(res)) {
         QString d = entry.time().toString(QStringLiteral("yyyy-MM-dd hh:mm::ss"));
         m_pCPart->Stdout
                 << (entry.kind() == svn_node_dir ? "D" : "F") << " "

@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -64,11 +64,6 @@ public:
     Path(const QString &path = QString());    //krazy:exclude=explicit
 
     ~Path() = default;
-
-    /**
-     * Assignment operator
-     */
-    Path &operator=(const Path &);
 
     /**
      * @return Path string

@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,41 +20,44 @@
 #include "watchedprocess.h"
 
 #include <QDir>
-#include <QList>
-#include <QString>
+#include <QStringList>
 
 class ProcessData
 {
 public:
-    ProcessData()
-        : _autoDelete(false)
-    {}
+    ProcessData() = default;
     ~ProcessData()
     {
         QStringList::iterator it2;
-        for (it2 = _tempFiles.begin(); it2 != _tempFiles.end(); ++it2) {
-            QFile::remove(*it2);
+        for (const QString &fn : qAsConst(_tempFiles)) {
+            QFile::remove(fn);
         }
-        for (it2 = _tempDirs.begin(); it2 != _tempDirs.end(); ++it2) {
-            QDir(*it2).removeRecursively();
+        for (const QString &dir : qAsConst(_tempDirs)) {
+            QDir(dir).removeRecursively();
         }
     }
 
     QStringList _tempFiles;
     QStringList _tempDirs;
-    bool _autoDelete;
+    bool _autoDelete = false;
 };
 
 WatchedProcess::WatchedProcess(QObject *parent)
     : KProcess(parent)
+    , m_Data(new ProcessData)
 {
-    m_Data = new ProcessData;
-    connect(this, SIGNAL(error(QProcess::ProcessError)), SLOT(slotError(QProcess::ProcessError)));
-    connect(this, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(slotFinished(int,QProcess::ExitStatus)));
-    connect(this, SIGNAL(readyReadStandardError()), SLOT(slotReadyReadStandardError()));
-    connect(this, SIGNAL(readyReadStandardOutput()), SLOT(slotReadyReadStandardOutput()));
-    connect(this, SIGNAL(started()), SLOT(slotStarted()));
-    connect(this, SIGNAL(stateChanged(QProcess::ProcessState)), SLOT(slotStateChanged(QProcess::ProcessState)));
+    connect(this, &QProcess::errorOccurred,
+            this, &WatchedProcess::slotError);
+    connect(this, QOverload<int, QProcess::ExitStatus>::of(&KProcess::finished),
+            this, &WatchedProcess::slotFinished);
+    connect(this, &QProcess::readyReadStandardError,
+            this, &WatchedProcess::slotReadyReadStandardError);
+    connect(this, &QProcess::readyReadStandardOutput,
+            this, &WatchedProcess::slotReadyReadStandardOutput);
+    connect(this, &KProcess::started,
+            this, &WatchedProcess::slotStarted);
+    connect(this, &KProcess::stateChanged,
+            this, &WatchedProcess::slotStateChanged);
 }
 
 WatchedProcess::~WatchedProcess()

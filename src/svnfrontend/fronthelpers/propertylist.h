@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2007 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -35,7 +35,7 @@ public:
     ~Propertylist();
 
     bool checkExisting(const QString &aName, QTreeWidgetItem *it = nullptr);
-    bool commitchanges()const
+    bool commitchanges() const
     {
         return m_commitit;
     }
@@ -43,7 +43,6 @@ public:
     {
         m_commitit = how;
     }
-    void addCallback(QObject *ob);
 
 public Q_SLOTS:
     void displayList(const svn::PathPropertiesMapListPtr &, bool, bool, const QString &);

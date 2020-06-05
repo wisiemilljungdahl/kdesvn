@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 #ifndef SVNCOMMITITEM_H
 #define SVNCOMMITITEM_H
@@ -58,7 +58,7 @@ protected:
 
 public:
     //! constructor
-    explicit CommitItem(const svn_client_commit_item_t *aSource = 0);
+    explicit CommitItem(const svn_client_commit_item_t *aSource = nullptr);
     //! constructor
     /*!
      * This one will only do something if build against subversion 1.3

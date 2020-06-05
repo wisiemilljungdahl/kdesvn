@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -96,16 +96,6 @@ const QByteArray
 Path::cstr() const
 {
     return m_path.toUtf8();
-}
-
-Path &
-Path::operator=(const Path &path)
-{
-    if (this == &path) {
-        return *this;
-    }
-    m_path = path.path();
-    return *this;
 }
 
 bool

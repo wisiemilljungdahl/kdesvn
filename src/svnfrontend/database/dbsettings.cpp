@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  * This program is free software; you can redistribute it and/or           *
  * modify it under the terms of the GNU General Public              *
@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 #include "dbsettings.h"
 #include "ui_dbsettings.h"
@@ -34,8 +34,8 @@ DbSettings::DbSettings(const QString &repository, QWidget *parent)
 {
     m_ui->setupUi(this);
     setDefaultButton(m_ui->buttonBox->button(QDialogButtonBox::Ok));
-    connect(m_ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(m_ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &DbSettings::accept);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &DbSettings::reject);
     setWindowTitle(i18nc("@title:window", "Settings for %1", repository));
     init();
 }

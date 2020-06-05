@@ -1,6 +1,5 @@
 ####
  #   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        #
- #   http://kdesvn.alwins-world.de/                                        #
  #                                                                         #
  #   This program is free software; you can redistribute it and/or modify  #
  #   it under the terms of the GNU General Public License as published by  #
@@ -106,8 +105,9 @@ if(UNIX)
   string(REGEX REPLACE "^ +" "" APU_EXTRA_LDFLAGS "${APU_EXTRA_LDFLAGS}")
   message(STATUS "Found apu extra ldflags: ${APU_EXTRA_LDFLAGS}")
 
-  check_include_files(execinfo.h HAS_BACKTRACE_H)
-  if(HAS_BACKTRACE_H)
+  find_package(Backtrace)
+  if(Backtrace_FOUND)
+    set(HAS_BACKTRACE_H true)
     option(USE_BACKTRACE "Generate a backtrace when a svnclient exception is thrown" OFF)
   endif()
 

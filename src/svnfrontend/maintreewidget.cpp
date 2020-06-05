@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -56,7 +56,6 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QKeyEvent>
-#include <QMap>
 #include <QUrlQuery>
 #include <QTimer>
 
@@ -137,31 +136,31 @@ MainTreeWidget::MainTreeWidget(KActionCollection *aCollection, QWidget *parent, 
     m_Data->m_DirSortModel->setSourceModel(m_Data->m_Model);
 
     connect(m_TreeView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            this, SLOT(slotSelectionChanged(QItemSelection,QItemSelection)));
+            &QItemSelectionModel::selectionChanged,
+            this, &MainTreeWidget::slotSelectionChanged);
 
     connect(m_DirTreeView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            this, SLOT(slotDirSelectionChanged(QItemSelection,QItemSelection)));
+            &QItemSelectionModel::selectionChanged,
+            this, &MainTreeWidget::slotDirSelectionChanged);
 
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(clientException(QString)), this, SLOT(slotClientException(QString)));
-    connect(m_Data->m_Model, SIGNAL(clientException(QString)), this, SLOT(slotClientException(QString)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sendNotify(QString)), this, SLOT(slotNotifyMessage(QString)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(reinitItem(SvnItem*)), this, SLOT(slotReinitItem(SvnItem*)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigRefreshAll()), this, SLOT(refreshCurrentTree()));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigRefreshCurrent(SvnItem*)), this, SLOT(refreshCurrent(SvnItem*)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigRefreshItem(QString)), this, SLOT(slotRefreshItem(QString)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigGotourl(QUrl)), this, SLOT(_openUrl(QUrl)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigCacheStatus(qlonglong,qlonglong)), this, SIGNAL(sigCacheStatus(qlonglong,qlonglong)));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigThreadsChanged()), this, SLOT(enableActions()));
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigCacheDataChanged()), this, SLOT(slotCacheDataChanged()));
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::clientException, this, &MainTreeWidget::slotClientException);
+    connect(m_Data->m_Model, &SvnItemModel::clientException, this, &MainTreeWidget::slotClientException);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sendNotify, this, &MainTreeWidget::slotNotifyMessage);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::reinitItem, this, &MainTreeWidget::slotReinitItem);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigRefreshAll, this, &MainTreeWidget::refreshCurrentTree);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigRefreshCurrent, this, &MainTreeWidget::refreshCurrent);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigRefreshItem, this, &MainTreeWidget::slotRefreshItem);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigGotourl, this, &MainTreeWidget::_openUrl);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigCacheStatus, this, &MainTreeWidget::sigCacheStatus);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigThreadsChanged, this, &MainTreeWidget::enableActions);
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigCacheDataChanged, this, &MainTreeWidget::slotCacheDataChanged);
 
-    connect(m_Data->m_Model->svnWrapper(), SIGNAL(sigExtraStatusMessage(QString)), this, SIGNAL(sigExtraStatusMessage(QString)));
+    connect(m_Data->m_Model->svnWrapper(), &SvnActions::sigExtraStatusMessage, this, &MainTreeWidget::sigExtraStatusMessage);
 
-    connect(m_Data->m_Model, SIGNAL(urlDropped(QList<QUrl>,Qt::DropAction,QModelIndex,bool)),
-            this, SLOT(slotUrlDropped(QList<QUrl>,Qt::DropAction,QModelIndex,bool)));
+    connect(m_Data->m_Model, &SvnItemModel::urlDropped,
+            this, &MainTreeWidget::slotUrlDropped);
 
-    connect(m_Data->m_Model, SIGNAL(itemsFetched(QModelIndex)), this, SLOT(slotItemsInserted(QModelIndex)));
+    connect(m_Data->m_Model, &SvnItemModel::itemsFetched, this, &MainTreeWidget::slotItemsInserted);
 
     m_TreeView->sortByColumn(0, Qt::AscendingOrder);
     m_DirTreeView->sortByColumn(0, Qt::AscendingOrder);
@@ -170,16 +169,19 @@ MainTreeWidget::MainTreeWidget(KActionCollection *aCollection, QWidget *parent, 
     setupActions();
 
     m_Data->m_TimeModified.setParent(this);
-    connect(&(m_Data->m_TimeModified), SIGNAL(timeout()), this, SLOT(slotCheckModified()));
+    connect(&(m_Data->m_TimeModified), &QTimer::timeout, this, &MainTreeWidget::slotCheckModified);
     m_Data->m_TimeUpdates.setParent(this);
-    connect(&(m_Data->m_TimeUpdates), SIGNAL(timeout()), this, SLOT(slotCheckUpdates()));
+    connect(&(m_Data->m_TimeUpdates), &QTimer::timeout, this, &MainTreeWidget::slotCheckUpdates);
     m_Data->m_resizeColumnsTimer.setSingleShot(true);
     m_Data->m_resizeColumnsTimer.setParent(this);
-    connect(&(m_Data->m_resizeColumnsTimer), SIGNAL(timeout()), this, SLOT(resizeAllColumns()));
+    connect(&(m_Data->m_resizeColumnsTimer), &QTimer::timeout, this, &MainTreeWidget::resizeAllColumns);
 }
 
 MainTreeWidget::~MainTreeWidget()
 {
+    // make sure to not get signals which affect the mmi
+    m_Data->m_Model->disconnect(this);
+    m_Data->m_Model->svnWrapper()->disconnect(this);
     delete m_Data;
 }
 
@@ -237,7 +239,7 @@ bool MainTreeWidget::openUrl(const QUrl &url, bool noReinit)
         if (url.isLocalFile()) {
             QFileInfo fi(url.path());
             if (fi.exists() && fi.isSymLink()) {
-                const QString sl = fi.readLink();
+                const QString sl = fi.symLinkTarget();
                 if (sl.startsWith(QLatin1Char('/'))) {
                     setBaseUri(sl);
                 } else {
@@ -268,14 +270,14 @@ bool MainTreeWidget::openUrl(const QUrl &url, bool noReinit)
                 clear();
                 KMessageBox::error(this, i18n("Networked URL to open but networking is disabled."));
                 emit changeCaption(QString());
-                emit sigUrlOpend(false);
+                emit sigUrlOpened(false);
                 return false;
             }
         }
     }
     const QList<QPair<QString, QString>> q = QUrlQuery(url).queryItems();
     typedef QPair<QString, QString> queryPair;
-    Q_FOREACH(const queryPair &p, q) {
+    for (const queryPair &p : q) {
         if (p.first == QLatin1String("rev")) {
             const QString v = p.second;
             svn::Revision tmp;
@@ -325,14 +327,14 @@ bool MainTreeWidget::openUrl(const QUrl &url, bool noReinit)
     _counttime.restart();
 #endif
     emit changeCaption(baseUri());
-    emit sigUrlOpend(result);
+    emit sigUrlOpened(result);
     emit sigUrlChanged(baseUriAsUrl());
 #ifdef DEBUG_TIMER
     qCDebug(KDESVN_LOG) << "Fired signals " << _counttime.elapsed();
     _counttime.restart();
 #endif
 
-    QTimer::singleShot(1, this, SLOT(readSupportData()));
+    QTimer::singleShot(1, this, &MainTreeWidget::readSupportData);
     enableActions();
 #ifdef DEBUG_TIMER
     qCDebug(KDESVN_LOG) << "Enabled actions " << _counttime.elapsed();
@@ -388,8 +390,8 @@ SvnItemList MainTreeWidget::SelectionList()const
         }
         return ret;
     }
-    for (int i = 0; i < _mi.count(); ++i) {
-        ret.push_back(m_Data->sourceNode(_mi[i], false));
+    for (const QModelIndex &idx : _mi) {
+        ret.push_back(m_Data->sourceNode(idx, false));
     }
     return ret;
 }
@@ -399,8 +401,8 @@ SvnItemList MainTreeWidget::DirSelectionList()const
     SvnItemList ret;
     const QModelIndexList _mi = m_DirTreeView->selectionModel()->selectedRows(0);
     ret.reserve(_mi.size());
-    for (int i = 0; i < _mi.count(); ++i) {
-        ret.push_back(m_Data->sourceNode(_mi[i], true));
+    for (const QModelIndex &idx : _mi) {
+        ret.push_back(m_Data->sourceNode(idx, true));
     }
     return ret;
 }
@@ -452,7 +454,7 @@ SvnItemModelNode *MainTreeWidget::DirSelectedNode()const
 void MainTreeWidget::slotSelectionChanged(const QItemSelection &, const QItemSelection &)
 {
     enableActions();
-    QTimer::singleShot(100, this, SLOT(_propListTimeout()));
+    QTimer::singleShot(100, this, &MainTreeWidget::_propListTimeout);
 }
 
 SvnItem *MainTreeWidget::Selected()const
@@ -713,8 +715,7 @@ void MainTreeWidget::enableActions()
     bool all_unversioned = true;
     bool all_versioned = true;
     bool at_least_one_directory = false;
-    for(int i = 0; i < fileList.size(); ++i) {
-      const SvnItem *item = fileList.at(i);
+    for (auto item : fileList) {
       if (!item) {
           // root item
           continue;
@@ -735,6 +736,8 @@ void MainTreeWidget::enableActions()
       }
       if (item->isDir()) {
           at_least_one_directory = true;
+          if (item->isChildModified())
+            at_least_one_changed = true;
       }
     }
 
@@ -870,7 +873,7 @@ void MainTreeWidget::closeMe()
     setBaseUri(QString());
 
     emit changeCaption(QString());
-    emit sigUrlOpend(false);
+    emit sigUrlOpened(false);
     emit sigUrlChanged(QUrl());
 
     enableActions();
@@ -886,7 +889,7 @@ void MainTreeWidget::refreshCurrentTree()
     m_Data->m_SortModel->invalidate();
     setUpdatesEnabled(true);
     //viewport()->repaint();
-    QTimer::singleShot(1, this, SLOT(readSupportData()));
+    QTimer::singleShot(1, this, &MainTreeWidget::readSupportData);
 }
 
 void MainTreeWidget::slotSettingsChanged()
@@ -1050,11 +1053,11 @@ void MainTreeWidget::recAddIgnore(SvnItem *item)
     if (!m_Data->m_Model->svnWrapper()->makeStatus(item->fullName(), res, start, _d, true /* all entries */, false, false)) {
         return;
     }
-    for (int i = 0; i < res.count(); ++i) {
-        if (!res[i]->isRealVersioned() || res[i]->entry().kind() != svn_node_dir) {
+    for (const svn::StatusPtr &ptr: qAsConst(res)) {
+        if (!ptr->isRealVersioned() || ptr->entry().kind() != svn_node_dir) {
             continue;
         }
-        m_Data->m_Model->svnWrapper()->makeIgnoreEntry(res[i]->path(), _pattern, unignore);
+        m_Data->m_Model->svnWrapper()->makeIgnoreEntry(ptr->path(), _pattern, unignore);
     }
     refreshCurrentTree();
     delete dlg;
@@ -1334,8 +1337,8 @@ void MainTreeWidget::slotLock()
     ptr->saveHistory(false);
 
     QStringList displist;
-    for (int i = 0; i < lst.count(); ++i) {
-        displist.append(lst[i]->fullName());
+    for (const SvnItem *item : lst) {
+        displist.append(item->fullName());
     }
     m_Data->m_Model->svnWrapper()->makeLock(displist, logMessage, steal);
     refreshCurrentTree();
@@ -1363,8 +1366,8 @@ void MainTreeWidget::slotUnlock()
     bool breakit = res == KMessageBox::Yes;
 
     QStringList displist;
-    for (int i = 0; i < lst.count(); ++i) {
-        displist.append(lst[i]->fullName());
+    for (const SvnItem *item : lst) {
+        displist.append(item->fullName());
     }
     m_Data->m_Model->svnWrapper()->makeUnlock(displist, breakit);
     refreshCurrentTree();
@@ -1649,15 +1652,14 @@ void MainTreeWidget::makeDelete(const SvnItemList &lst)
     svn::Paths items;
     QStringList displist;
     QList<QUrl> kioList;
-    SvnItemList::const_iterator liter;
-    for (liter = lst.begin(); liter != lst.end(); ++liter) {
-        if (!(*liter)->isRealVersioned()) {
-            QUrl _uri(QUrl::fromLocalFile((*liter)->fullName()));
+    for (const SvnItem *item : lst) {
+        if (!item->isRealVersioned()) {
+            QUrl _uri(QUrl::fromLocalFile(item->fullName()));
             kioList.append(_uri);
         } else {
-            items.push_back((*liter)->fullName());
+            items.push_back(item->fullName());
         }
-        displist.append((*liter)->fullName());
+        displist.append(item->fullName());
     }
 
     QPointer<DeleteForm> dlg(new DeleteForm(displist, QApplication::activeModalWidget()));
@@ -1696,11 +1698,10 @@ void MainTreeWidget::internalDrop(const QList<QUrl> &_lst, Qt::DropAction action
     if (!isWorkingCopy()) {
         nProto = svn::Url::transformProtokoll(lst[0].scheme());
     }
-    QList<QUrl>::iterator it = lst.begin();
-    for (; it != lst.end(); ++it) {
-        (*it).setQuery(QUrlQuery());
+    for (QUrl &url : lst) {
+        url.setQuery(QUrlQuery());
         if (!nProto.isEmpty())
-            (*it).setScheme(nProto);
+            url.setScheme(nProto);
     }
 
     if (index.isValid()) {
@@ -1748,7 +1749,7 @@ void MainTreeWidget::slotUrlDropped(const QList<QUrl> &_lst, Qt::DropAction acti
     } else {
         WidgetBlockStack w(this);
         KIO::Job *job = KIO::copy(_lst, target);
-        connect(job, SIGNAL(result(KJob*)), SLOT(slotCopyFinished(KJob*)));
+        connect(job, &KJob::result, this, &MainTreeWidget::slotCopyFinished);
         job->exec();
     }
 }
@@ -1770,9 +1771,9 @@ void MainTreeWidget::slotCopyFinished(KJob *_job)
         const QString base = job->destUrl().toLocalFile() + QLatin1Char('/');
         svn::Paths tmp;
         tmp.reserve(lst.size());
-        Q_FOREACH(const QUrl &url, lst) {
+        for (const QUrl &url : lst)
             tmp.push_back(svn::Path(base + url.fileName()));
-        }
+
         m_Data->m_Model->svnWrapper()->addItems(tmp, svn::DepthInfinity);
     }
     refreshCurrentTree();
@@ -2133,7 +2134,7 @@ void MainTreeWidget::slotChangeToRepository()
     if (i.reposRoot().isEmpty()) {
         KMessageBox::sorry(QApplication::activeModalWidget(), i18n("Could not retrieve repository of working copy."), i18n("SVN Error"));
     } else {
-        sigSwitchUrl(i.reposRoot());
+        emit sigSwitchUrl(i.reposRoot());
     }
 }
 
@@ -2240,7 +2241,7 @@ void MainTreeWidget::slotDirSelectionChanged(const QItemSelection &_item, const 
         if (item) {
             const QString repoBasePath = baseUri();
             const QString relativePath = item->fullName().mid(repoBasePath.lastIndexOf('/') + 1);
-            changeCaption(relativePath);
+            emit changeCaption(relativePath);
         }
 
     } else {
@@ -2287,9 +2288,8 @@ void MainTreeWidget::slotDirUpdate()
         what.append(svn::Path(baseUri()));
     } else {
         what.reserve(which.size());
-        Q_FOREACH(const SvnItem *item, which) {
+        for (const SvnItem *item : which)
             what.append(svn::Path(item->fullName()));
-        }
     }
     m_Data->m_Model->svnWrapper()->makeUpdate(svn::Targets(what), svn::Revision::HEAD, svn::DepthUnknown);
 }

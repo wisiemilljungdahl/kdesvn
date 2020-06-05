@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  * This program is free software; you can redistribute it and/or           *
  * modify it under the terms of the GNU Lesser General Public              *
@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 
 /***************************************************************************
@@ -80,7 +80,7 @@ template <typename T> inline
 void ReposConfig::writeCheck(const QString &repository, const QString &key, const T &value)
 {
     ConversionCheck::to_QVariant<T>();
-    setValue(repository, key, qVariantFromValue(value));
+    setValue(repository, key, QVariant::fromValue(value));
 }
 
 template<typename T> inline
@@ -95,9 +95,8 @@ void ReposConfig::writeListCheck(const QString &repository, const QString &key, 
     ConversionCheck::to_QVariant<T>();
     ConversionCheck::to_QString<T>();
     QVariantList data;
-    Q_FOREACH (const T &value, list) {
+    for (const T &value : list)
         data.append(qVariantFromValue(value));
-    }
     setValue(repository, key, data);
 }
 

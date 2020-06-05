@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -29,7 +29,7 @@ public:
     explicit PropertyListViewItem(QTreeWidget *parent, const QString &aStartName = QString(), const QString &aStartValue = QString());
 
     const QString &startName() const { return m_startName; }
-    const QString &startValue()const { return m_startValue; }
+    const QString &startValue() const { return m_startValue; }
     const QString &currentName() const { return m_currentName; }
     const QString &currentValue() const { return m_currentValue; }
 

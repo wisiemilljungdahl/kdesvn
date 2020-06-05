@@ -100,6 +100,7 @@ kdesvn::kdesvn()
             setCentralWidget(m_part->widget());
             connect(this, SIGNAL(sigSavestate()), m_part->widget(), SLOT(slotSavestate()));
             connect(m_part->widget(), SIGNAL(sigExtraStatusMessage(QString)), this, SLOT(slotExtraStatus(QString)));
+            connect(m_part->widget(), SIGNAL(sigUrlOpened(bool)), this, SLOT(slotUrlOpened(bool)));
 
             QAction *tmpAction;
             tmpAction = actionCollection()->addAction(QStringLiteral("subversion_create_repo"),
@@ -175,7 +176,7 @@ void kdesvn::loadRescent(const QUrl &url)
 
 void kdesvn::load(const QUrl &url, bool addRescent)
 {
-    QTimer::singleShot(100, this, SLOT(slotResetExtraStatus()));
+    QTimer::singleShot(100, this, &kdesvn::slotResetExtraStatus);
     if (m_part) {
         bool ret = m_part->openUrl(url);
         KRecentFilesAction *rac = nullptr;
@@ -232,7 +233,7 @@ void kdesvn::setupActions()
     toggletemp->setToolTip(i18n("Reload last opened URL if no one is given on command line"));
     KConfigGroup cs(KSharedConfig::openConfig(), "startup");
     toggletemp->setChecked(cs.readEntry("load_last_on_start", false));
-    connect(toggletemp, SIGNAL(toggled(bool)), this, SLOT(slotLoadLast(bool)));
+    connect(toggletemp, &QAction::toggled, this, &kdesvn::slotLoadLast);
 }
 
 void kdesvn::optionsShowStatusbar()
@@ -252,7 +253,7 @@ void kdesvn::fileClose()
         close();
     } else {
         enableClose(false);
-        QTimer::singleShot(100, this, SLOT(slotResetExtraStatus()));
+        QTimer::singleShot(100, this, &kdesvn::slotResetExtraStatus);
         enableClose(false);
     }
 }
@@ -367,8 +368,8 @@ void kdesvn::optionsConfigureToolbars()
 
     // use the standard toolbar editor
     QPointer<KEditToolBar> dlg(new KEditToolBar(factory()));
-    connect(dlg, SIGNAL(newToolbarConfig()),
-            this, SLOT(applyNewToolbarConfig()));
+    connect(dlg.data(), &KEditToolBar::newToolBarConfig,
+            this, &kdesvn::applyNewToolbarConfig);
     dlg->exec();
     delete dlg;
 }

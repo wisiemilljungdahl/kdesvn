@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 
 /***************************************************************************
@@ -48,9 +48,8 @@ static QVector<int> asIntVec(const QByteArray &string)
     const QList<QByteArray> strList = string.split(',');
     QVector<int> vec;
     vec.reserve(strList.size());
-    Q_FOREACH (const QByteArray &s, strList) {
+    for (const QByteArray &s : strList)
         vec << s.toInt();
-    }
     return vec;
 }
 
@@ -270,7 +269,7 @@ void ReposConfig::setValue(const QString &repository, const QString &key, const 
 {
     QList<QByteArray> data;
 
-    foreach (const QVariant &v, list) {
+    for (const QVariant &v : list) {
         if (v.type() == QVariant::ByteArray) {
             data << v.toByteArray();
         } else {
@@ -284,9 +283,8 @@ void ReposConfig::setValue(const QString &repository, const QString &key, const 
 void ReposConfig::setValue(const QString &repository, const QString &key, const QStringList &list)
 {
     QList<QByteArray> balist;
-    foreach (const QString &entry, list) {
+    for (const QString &entry : list)
         balist.append(entry.toUtf8());
-    }
     setValue(repository, key, ReposConfigPrivate::serializeList(balist));
 }
 

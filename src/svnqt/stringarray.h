@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 
 #ifndef STRING_ARRAY_H
@@ -50,8 +50,6 @@ public:
     explicit StringArray(const QStringList &);
     explicit StringArray(const apr_array_header_t *apr_targets);
     QStringList::size_type size()const;
-    const QString &operator[](QStringList::size_type which)const;
-    QString &operator[](QStringList::size_type which);
     /**
      * Returns an apr array containing char*.
      *

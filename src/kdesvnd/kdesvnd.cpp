@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -76,7 +76,7 @@ QStringList kdesvnd::getTopLevelActionMenu(const QStringList &urlList) const
     // we get correct urls here
     QList<QUrl> urls;
     urls.reserve(urlList.size());
-    Q_FOREACH(const QString &str, urlList) {
+    for (const QString &str : urlList) {
         if (str.contains(QLatin1Char('@')))
             urls += QUrl(str + QLatin1Char('@'));
         else
@@ -91,7 +91,7 @@ QStringList kdesvnd::getActionMenu(const QStringList &urlList) const
     // we get correct urls here
     QList<QUrl> urls;
     urls.reserve(urlList.size());
-    Q_FOREACH(const QString &str, urlList) {
+    for (const QString &str : urlList) {
         if (str.contains(QLatin1Char('@')))
             urls += QUrl(str + QLatin1Char('@'));
         else
@@ -180,7 +180,7 @@ QStringList kdesvnd::getSingleActionMenu(const QString &what) const
     return getActionMenu(l, false);
 }
 
-QStringList kdesvnd::get_saved_login(const QString &realm, const QString &user)
+QStringList kdesvnd::get_saved_login(const QString &realm, const QString &user) const
 {
     Q_UNUSED(user);
     QString username;
@@ -193,7 +193,7 @@ QStringList kdesvnd::get_saved_login(const QString &realm, const QString &user)
 
 }
 
-QStringList kdesvnd::get_login(const QString &realm, const QString &user)
+QStringList kdesvnd::get_login(const QString &realm, const QString &user) const
 {
     QPointer<AuthDialogImpl> auth(new AuthDialogImpl(realm, user));
     QStringList res;
@@ -210,7 +210,12 @@ QStringList kdesvnd::get_login(const QString &realm, const QString &user)
     return res;
 }
 
-int kdesvnd::get_sslaccept(const QString &hostname, const QString &fingerprint, const QString &validFrom, const QString &validUntil, const QString &issuerDName, const QString &realm)
+int kdesvnd::get_sslaccept(const QString &hostname,
+                           const QString &fingerprint,
+                           const QString &validFrom,
+                           const QString &validUntil,
+                           const QString &issuerDName,
+                           const QString &realm) const
 {
     bool ok, saveit;
     if (!SslTrustPrompt::sslTrust(
@@ -230,7 +235,7 @@ int kdesvnd::get_sslaccept(const QString &hostname, const QString &fingerprint, 
     return 1;
 }
 
-QString kdesvnd::load_sslclientcertpw(const QString &realm)
+QString kdesvnd::load_sslclientcertpw(const QString &realm) const
 {
     QString password;
     if (!PwStorage::self()->getCertPw(realm, password)) {
@@ -239,7 +244,7 @@ QString kdesvnd::load_sslclientcertpw(const QString &realm)
     return password;
 }
 
-QStringList kdesvnd::get_sslclientcertpw(const QString &realm)
+QStringList kdesvnd::get_sslclientcertpw(const QString &realm) const
 {
     QStringList resList;
     QPointer<KPasswordDialog> dlg(new KPasswordDialog(nullptr, KPasswordDialog::DomainReadOnly | KPasswordDialog::ShowKeepPassword));

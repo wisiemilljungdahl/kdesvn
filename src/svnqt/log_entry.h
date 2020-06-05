@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -35,6 +35,7 @@
 #include <svnqt/svnqt_defines.h>
 #include <svnqt/datetime.h>
 
+#include <QList>
 #include <QString>
 #include <QVector>
 
@@ -57,13 +58,12 @@ struct LogChangePathEntry
                        const QString &copyFromPath_,
                        const svn_revnum_t copyFromRevision_)
         : path(path_)
-        , action(action_)
         , copyFromPath(copyFromPath_)
         , copyFromRevision(copyFromRevision_)
+        , action(action_)
     {}
 
     QString path;
-    char action = '\0';
     QString copyFromPath;
     //! future use or useful in backends
     QString copyToPath;
@@ -71,6 +71,7 @@ struct LogChangePathEntry
     qlonglong copyFromRevision;
     //! future use or useful in backends
     qlonglong copyToRevision;
+    char action = '\0';
 };
 
 typedef QVector<LogChangePathEntry> LogChangePathEntries;

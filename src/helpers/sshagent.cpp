@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -166,15 +166,15 @@ void SshAgent::slotProcessExited(int exitCode, QProcess::ExitStatus exitStatus)
     const QRegExp bashSockRx(QStringLiteral("SSH_AUTH_SOCK=(.*\\.\\d*);.*"));
     const QStringList m_outputLines = m_Output.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 
-    for (auto it = m_outputLines.begin(); it != m_outputLines.end(); ++it) {
+    for (const auto &outputLine : m_outputLines) {
         if (m_pid.isEmpty()) {
-            int pos = cshPidRx.indexIn(*it);
+            int pos = cshPidRx.indexIn(outputLine);
             if (pos > -1) {
                 m_pid = cshPidRx.cap(1);
                 continue;
             }
 
-            pos = bashPidRx.indexIn(*it);
+            pos = bashPidRx.indexIn(outputLine);
             if (pos > -1) {
                 m_pid = bashPidRx.cap(1);
                 continue;
@@ -182,13 +182,13 @@ void SshAgent::slotProcessExited(int exitCode, QProcess::ExitStatus exitStatus)
         }
 
         if (m_authSock.isEmpty()) {
-            int pos = cshSockRx.indexIn(*it);
+            int pos = cshSockRx.indexIn(outputLine);
             if (pos > -1) {
                 m_authSock = cshSockRx.cap(1);
                 continue;
             }
 
-            pos = bashSockRx.indexIn(*it);
+            pos = bashSockRx.indexIn(outputLine);
             if (pos > -1) {
                 m_authSock = bashSockRx.cap(1);
                 continue;
@@ -216,10 +216,10 @@ bool SshAgent::startSshAgent()
 
     sshAgent->setOutputChannelMode(KProcess::MergedChannels);
 
-    connect(sshAgent, SIGNAL(finished(int,QProcess::ExitStatus)),
-            SLOT(slotProcessExited(int,QProcess::ExitStatus)));
-    connect(sshAgent, SIGNAL(readyReadStandardOutput()),
-            SLOT(slotReceivedStdout()));
+    connect(sshAgent, QOverload<int,QProcess::ExitStatus>::of(&KProcess::finished),
+            this, &SshAgent::slotProcessExited);
+    connect(sshAgent, &KProcess::readyReadStandardOutput,
+            this, &SshAgent::slotReceivedStdout);
     sshAgent->start();
     // wait for process to finish eg. backgrounding
     sshAgent->waitForFinished(-1);

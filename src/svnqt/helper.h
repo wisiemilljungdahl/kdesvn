@@ -20,7 +20,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 #ifndef SVNQT_HELPER_H
 #define SVNQT_HELPER_H
@@ -69,7 +69,6 @@ public:
             _value =  svn_depth_immediates;
             break;
         case DepthInfinity:
-        default:
             _value =  svn_depth_infinity;
             break;
         }
@@ -93,10 +92,10 @@ public:
         apr_array_header_t *ranges = apr_array_make(pool, m_ranges.size(), sizeof(svn_opt_revision_range_t *));
         svn_opt_revision_range_t *range;
 
-        for (long j = 0; j < m_ranges.count(); ++j) {
+        for (const RevisionRange &rr : qAsConst(m_ranges)) {
             range = (svn_opt_revision_range_t *)apr_palloc(pool, sizeof(*range));
-            range->start = *m_ranges[j].first.revision();
-            range->end  = *m_ranges[j].second.revision();
+            range->start = *rr.first.revision();
+            range->end  = *rr.second.revision();
             APR_ARRAY_PUSH(ranges, svn_opt_revision_range_t *) = range;
         }
         return ranges;
@@ -112,18 +111,14 @@ public:
     apr_hash_t *hash(const Pool &pool)const
     {
         if (_map.count() == 0) {
-            return 0L;
+            return nullptr;
         }
         apr_hash_t *hash = apr_hash_make(pool);
-        PropertiesMap::ConstIterator it;
-        const char *propval;
-        const char *propname;
-        QByteArray s, n;
-        for (it = _map.begin(); it != _map.end(); ++it) {
-            s = it.value().toUtf8();
-            n = it.key().toUtf8();
-            propval = apr_pstrndup(pool, s, s.size());
-            propname = apr_pstrndup(pool, n, n.size());
+        for (auto it = _map.begin(); it != _map.end(); ++it) {
+            const QByteArray s = it.value().toUtf8();
+            const QByteArray n = it.key().toUtf8();
+            const char *propval = apr_pstrndup(pool, s, s.size());
+            const char *propname = apr_pstrndup(pool, n, n.size());
             apr_hash_set(hash, propname, APR_HASH_KEY_STRING, propval);
         }
         return hash;
@@ -137,14 +132,14 @@ public:
     Hash2Map(apr_hash_t *hash, apr_pool_t *pool)
         : _map()
     {
-        if (hash != 0L) {
+        if (hash != nullptr) {
             apr_hash_index_t *hi;
             for (hi = apr_hash_first(pool, hash); hi;
                     hi = apr_hash_next(hi)) {
                 const void *key;
                 void *val;
 
-                apr_hash_this(hi, &key, NULL, &val);
+                apr_hash_this(hi, &key, nullptr, &val);
                 const char *_k = (const char *)key;
                 const char *_v = ((const svn_string_t *)val)->data;
 

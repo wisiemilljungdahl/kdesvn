@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -93,9 +93,8 @@ void GetInfoThread::appendNode(SvnItemModelNode *node)
     }
     QMutexLocker ml(&m_QueueLock);
     bool found = false;
-    QQueue<SvnItemModelNode *>::const_iterator it = m_NodeQueue.constBegin();
-    for (; it != m_NodeQueue.constEnd(); ++it) {
-        if ((*it)->fullName() == node->fullName()) {
+    for (const SvnItemModelNode *qNode : qAsConst(m_NodeQueue)) {
+        if (qNode->fullName() == node->fullName()) {
             found = true;
             break;
         }

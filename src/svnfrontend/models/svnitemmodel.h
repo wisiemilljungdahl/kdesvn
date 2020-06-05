@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,12 +20,12 @@
 #ifndef SVNITEMMODEL_H
 #define SVNITEMMODEL_H
 
-#include <QAbstractListModel>
+#include <QAbstractItemModel>
+#include <QScopedPointer>
 
 #include "svnitemmodelfwd.h"
 #include "svnqt/svnqttypes.h"
 
-#include <QScopedPointer>
 
 class SvnItemModelData;
 class QItemSelectionModel;

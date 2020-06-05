@@ -31,7 +31,7 @@
 
 #include <QFileDialog>
 #include <QFontDatabase>
-#include <QMatrix>
+#include <QTransform>
 #include <QMenu>
 #include <QPainter>
 #include <QRegExp>
@@ -70,10 +70,10 @@ RevGraphView::RevGraphView(const svn::ClientP &_client, QWidget *parent)
     m_CompleteView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_CompleteView->raise();
     m_CompleteView->hide();
-    connect(m_CompleteView, SIGNAL(zoomRectMoved(qreal,qreal)),
-            this, SLOT(zoomRectMoved(qreal,qreal)));
-    connect(m_CompleteView, SIGNAL(zoomRectMoveFinished()),
-            this, SLOT(zoomRectMoveFinished()));
+    connect(m_CompleteView, &PannerView::zoomRectMoved,
+            this, &RevGraphView::zoomRectMoved);
+    connect(m_CompleteView, &PannerView::zoomRectMoveFinished,
+            this, &RevGraphView::zoomRectMoveFinished);
 }
 
 RevGraphView::~RevGraphView()
@@ -512,14 +512,14 @@ void RevGraphView::dumpRevtree()
         }
     }
     stream << "}\n" << flush;
-    m_renderProcess = new KProcess();
+    m_renderProcess = new KProcess;
     m_renderProcess->setEnv("LANG", "C");
     *m_renderProcess << "dot";
     *m_renderProcess << m_dotTmpFile->fileName() << "-Tplain";
-    connect(m_renderProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
-            this, SLOT(dotExit(int,QProcess::ExitStatus)));
-    connect(m_renderProcess, SIGNAL(readyReadStandardOutput()),
-            this, SLOT(readDotOutput()));
+    connect(m_renderProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, &RevGraphView::dotExit);
+    connect(m_renderProcess, &QProcess::readyReadStandardOutput,
+            this, &RevGraphView::readDotOutput);
     m_renderProcess->setOutputChannelMode(KProcess::SeparateChannels);
     m_renderProcess->start();
 }
@@ -620,8 +620,7 @@ void RevGraphView::updateSizes(QSize s)
 
     if (zoom != m_cvZoom) {
         m_cvZoom = zoom;
-        QMatrix wm;
-        m_CompleteView->setMatrix(wm.scale(zoom, zoom));
+        m_CompleteView->setTransform(QTransform::fromScale(zoom, zoom));
 
         // make it a little bigger to compensate for widget frame
         m_CompleteView->resize(int(cWidth * zoom) + 4,
@@ -745,12 +744,12 @@ void RevGraphView::makeSelected(GraphTreeLabel *gtl)
 
 }
 
-GraphTreeLabel *RevGraphView::firstLabelAt(const QPoint &pos)const
+GraphTreeLabel *RevGraphView::firstLabelAt(const QPoint &pos) const
 {
     QList<QGraphicsItem *> its = items(pos);
-    for (QList<QGraphicsItem *>::size_type i = 0; i < its.size(); ++i) {
-        if (its[i]->type() == GRAPHTREE_LABEL) {
-            return static_cast<GraphTreeLabel *>(its[i]);
+    for (auto &it : its) {
+        if (it->type() == GRAPHTREE_LABEL) {
+            return static_cast<GraphTreeLabel *>(it);
         }
     }
 

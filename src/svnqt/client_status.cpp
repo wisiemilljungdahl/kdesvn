@@ -1,7 +1,7 @@
 /*
  * Port for usage with qt-framework and development for kdesvn
  * Copyright (C) 2005-2009 by Rajko Albrecht (ral@alwins-world.de)
- * http://kdesvn.alwins-world.de
+ * https://kde.org/applications/development/org.kde.kdesvn
  */
 /*
  * ====================================================================
@@ -213,12 +213,10 @@ remoteStatus(Client *client,
              const StatusParameter &params,
              const ContextP &)
 {
-    DirEntries dirEntries = client->list(params.path(), params.revision(), params.revision(), params.depth(), params.detailedRemote());
-    DirEntries::const_iterator it;
+    const DirEntries dirEntries = client->list(params.path(), params.revision(), params.revision(), params.depth(), params.detailedRemote());
 
     StatusEntries entries;
-    for (it = dirEntries.constBegin(); it != dirEntries.constEnd(); ++it) {
-        DirEntry dirEntry = *it;
+    for (const DirEntry &dirEntry : dirEntries) {
         if (dirEntry.name().isEmpty()) {
             continue;
         }

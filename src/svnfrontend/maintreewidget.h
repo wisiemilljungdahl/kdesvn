@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -66,7 +66,7 @@ Q_SIGNALS:
     void sigExtraStatusMessage(const QString &);
     void changeCaption(const QString &);
     void sigShowPopup(const QString &, QWidget **);
-    void sigUrlOpend(bool);
+    void sigUrlOpened(bool);
     void sigSwitchUrl(const QUrl &);
     void sigUrlChanged(const QUrl &);
     void sigProplist(const svn::PathPropertiesMapListPtr &, bool, bool, const QString &);
@@ -84,6 +84,7 @@ public Q_SLOTS:
     void refreshCurrent(SvnItem *);
     void slotReinitItem(SvnItem *);
     void stopLogCache();
+    void slotChangeProperties(const svn::PropertiesMap &, const QStringList &, const QString &);
 
 protected Q_SLOTS:
     void slotCacheDataChanged();
@@ -119,7 +120,6 @@ protected Q_SLOTS:
     void slotBlame();
     void slotRangeBlame();
     void slotDisplayProperties();
-    void slotChangeProperties(const svn::PropertiesMap &, const QStringList &, const QString &);
     void slotCat();
     void slotRevisionCat();
     void slotResolved();

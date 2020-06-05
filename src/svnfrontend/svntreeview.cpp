@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -33,16 +33,6 @@
 #include <KIconLoader>
 #include <KLocalizedString>
 #include <KUrlMimeData>
-
-SvnTreeView::SvnTreeView(QWidget *parent)
-    : QTreeView(parent)
-{
-
-}
-
-SvnTreeView::~SvnTreeView()
-{
-}
 
 void SvnTreeView::startDrag(Qt::DropActions supportedActions)
 {

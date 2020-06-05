@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -22,11 +22,6 @@
 #include "svnitemmodel.h"
 #include "svnitemnode.h"
 #include "settings/kdesvnsettings.h"
-
-SvnSortFilterProxy::SvnSortFilterProxy(QObject *parent)
-    : QSortFilterProxyModel(parent), m_sourceModel(nullptr), m_ShowFilter(svnmodel::All)
-{
-}
 
 void SvnSortFilterProxy::setSourceModel(QAbstractItemModel *sourceModel)
 {

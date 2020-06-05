@@ -19,7 +19,7 @@
  *                                                                         *
  * This software consists of voluntary contributions made by many          *
  * individuals.  For exact contribution history, see the revision          *
- * history and logs, available at http://kdesvn.alwins-world.de.           *
+ * history and logs, available at https://commits.kde.org/kdesvn.          *
  ***************************************************************************/
 #ifndef SVN_STREAMSVNFILESTREAM_HPP
 #define SVN_STREAMSVNFILESTREAM_HPP
@@ -41,12 +41,12 @@ class SvnFileStream_private;
 class SVNQT_EXPORT SvnFileOStream : public SvnStream
 {
 public:
-    explicit SvnFileOStream(const QString &fn, svn_client_ctx_t *ctx = 0);
+    explicit SvnFileOStream(const QString &fn, svn_client_ctx_t *ctx = nullptr);
 
     virtual ~SvnFileOStream();
 
-    virtual bool isOk() const;
-    virtual long write(const char *data, const unsigned long max);
+    bool isOk() const override;
+    long write(const char *data, const unsigned long max) override;
 private:
     SvnFileStream_private *m_FileData;
 };
@@ -58,11 +58,11 @@ private:
 class SVNQT_EXPORT SvnFileIStream : public SvnStream
 {
 public:
-    explicit SvnFileIStream(const QString &fn, svn_client_ctx_t *ctx = 0);
+    explicit SvnFileIStream(const QString &fn, svn_client_ctx_t *ctx = nullptr);
 
     virtual ~SvnFileIStream();
-    virtual bool isOk() const;
-    virtual long read(char *data, const unsigned long max);
+    bool isOk() const override;
+    long read(char *data, const unsigned long max) override;
 
 private:
     SvnFileStream_private *m_FileData;

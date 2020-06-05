@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2005-2009 by Rajko Albrecht  ral@alwins-world.de        *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -41,36 +41,32 @@
 // StoredDrawParams
 //
 StoredDrawParams::StoredDrawParams()
+    : _backColor(Qt::white)
+    , _selected(false)
+    , _current(false)
+    , _shaded(true)
+    , _rotated(false)
+    , _drawFrame(false)
 {
-    _selected = false;
-    _current = false;
-    _shaded = true;
-    _rotated = false;
-    _drawFrame = false;
-
-    _backColor = Qt::white;
-
     // field array has size 0
 }
 
 StoredDrawParams::StoredDrawParams(const QColor &c,
                                    bool selected,
                                    bool current)
+    : _backColor(c)
+    , _selected(selected)
+    , _current(current)
+    , _shaded(true)
+    , _rotated(false)
+    , _drawFrame(true)
 {
-    _backColor = c;
-
-    _selected = selected;
-    _current = current;
-    _shaded = true;
-    _rotated = false;
-    _drawFrame = true;
-
     // field array has size 0
 }
 
 QString StoredDrawParams::text(int f) const
 {
-    if ((f < 0) || (f >= (int)_field.size())) {
+    if ((f < 0) || (f >= _field.size())) {
         return QString();
     }
 
@@ -79,7 +75,7 @@ QString StoredDrawParams::text(int f) const
 
 QPixmap StoredDrawParams::pixmap(int f) const
 {
-    if ((f < 0) || (f >= (int)_field.size())) {
+    if ((f < 0) || (f >= _field.size())) {
         return QPixmap();
     }
 
@@ -88,7 +84,7 @@ QPixmap StoredDrawParams::pixmap(int f) const
 
 DrawParams::Position StoredDrawParams::position(int f) const
 {
-    if ((f < 0) || (f >= (int)_field.size())) {
+    if ((f < 0) || (f >= _field.size())) {
         return Default;
     }
 
@@ -97,7 +93,7 @@ DrawParams::Position StoredDrawParams::position(int f) const
 
 int StoredDrawParams::maxLines(int f) const
 {
-    if ((f < 0) || (f >= (int)_field.size())) {
+    if ((f < 0) || (f >= _field.size())) {
         return 0;
     }
 
@@ -186,9 +182,9 @@ void StoredDrawParams::setMaxLines(int f, int m)
 //
 
 RectDrawing::RectDrawing(const QRect &r)
+  : _fm(nullptr)
+  , _dp(nullptr)
 {
-    _fm = nullptr;
-    _dp = nullptr;
     setRect(r);
 }
 
@@ -269,14 +265,14 @@ void RectDrawing::drawBack(QPainter *p, DrawParams *dp)
     QRect r = _rect;
     QColor normal = dp->backColor();
     if (dp->selected()) {
-        normal = normal.light();
+        normal = normal.lighter();
     }
     bool isCurrent = dp->current();
 
     if (dp->drawFrame() || isCurrent) {
         // 3D raised/sunken frame effect...
-        QColor high = normal.light();
-        QColor low = normal.dark();
+        QColor high = normal.lighter();
+        QColor low = normal.darker();
         p->setPen(isCurrent ? low : high);
         p->drawLine(r.left(), r.top(), r.right(), r.top());
         p->drawLine(r.left(), r.top(), r.left(), r.bottom());
@@ -300,7 +296,7 @@ void RectDrawing::drawBack(QPainter *p, DrawParams *dp)
 
         // shade parameters:
         int d = 7;
-        float factor = 0.1, forth = 0.7, back1 = 0.9, toBack2 = .7, back2 = 0.97;
+        double factor = 0.1, forth = 0.7, back1 = 0.9, toBack2 = .7, back2 = 0.97;
 
         // coefficient corrections because of rectangle size
         int s = r.width();
@@ -320,9 +316,9 @@ void RectDrawing::drawBack(QPainter *p, DrawParams *dp)
 
         QColor shadeColor;
         while (factor < .95 && (r.width() >= 0 && r.height() >= 0)) {
-            shadeColor.setRgb((int)(rBase + factor * rDiff + .5),
-                              (int)(gBase + factor * gDiff + .5),
-                              (int)(bBase + factor * bDiff + .5));
+            shadeColor.setRgb(qRound(rBase + factor * rDiff),
+                              qRound(gBase + factor * gDiff),
+                              qRound(bBase + factor * bDiff));
             p->setPen(shadeColor);
             p->drawRect(r);
             r.setRect(r.x() + 1, r.y() + 1, r.width() - 2, r.height() - 2);
@@ -331,9 +327,9 @@ void RectDrawing::drawBack(QPainter *p, DrawParams *dp)
 
         // and back (1st half)
         while (factor > toBack2 && (r.width() >= 0 && r.height() >= 0)) {
-            shadeColor.setRgb((int)(rBase + factor * rDiff + .5),
-                              (int)(gBase + factor * gDiff + .5),
-                              (int)(bBase + factor * bDiff + .5));
+            shadeColor.setRgb(qRound(rBase + factor * rDiff),
+                              qRound(gBase + factor * gDiff),
+                              qRound(bBase + factor * bDiff));
             p->setPen(shadeColor);
             p->drawRect(r);
             r.setRect(r.x() + 1, r.y() + 1, r.width() - 2, r.height() - 2);
@@ -342,9 +338,9 @@ void RectDrawing::drawBack(QPainter *p, DrawParams *dp)
 
         // and back (2nd half)
         while (factor > .01 && (r.width() >= 0 && r.height() >= 0)) {
-            shadeColor.setRgb((int)(rBase + factor * rDiff + .5),
-                              (int)(gBase + factor * gDiff + .5),
-                              (int)(bBase + factor * bDiff + .5));
+            shadeColor.setRgb(qRound(rBase + factor * rDiff),
+                              qRound(gBase + factor * gDiff),
+                              qRound(bBase + factor * bDiff));
             p->setPen(shadeColor);
             p->drawRect(r);
             r.setRect(r.x() + 1, r.y() + 1, r.width() - 2, r.height() - 2);
@@ -372,7 +368,11 @@ int findBreak(int &breakPos, QString text, QFontMetrics *fm, int maxWidth)
 
     // does full text fit?
     breakPos = text.length();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    usedWidth = fm->horizontalAdvance(text);
+#else
     usedWidth = fm->width(text);
+#endif
     if (usedWidth < maxWidth) {
         return usedWidth;
     }
@@ -382,7 +382,11 @@ int findBreak(int &breakPos, QString text, QFontMetrics *fm, int maxWidth)
     int bottomPos = 0;
     while (qAbs(maxWidth - usedWidth) > 3 * fm->maxWidth()) {
         int halfPos = (bottomPos + breakPos) / 2;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        int halfWidth = fm->horizontalAdvance(text, halfPos);
+#else
         int halfWidth = fm->width(text, halfPos);
+#endif
         if (halfWidth < maxWidth) {
             bottomPos = halfPos;
         } else {
@@ -413,7 +417,11 @@ int findBreak(int &breakPos, QString text, QFontMetrics *fm, int maxWidth)
         lastCat = cat;
 
         breakPos = pos;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        usedWidth = fm->horizontalAdvance(text, breakPos);
+#else
         usedWidth = fm->width(text, breakPos);
+#endif
         if (usedWidth < maxWidth) {
             break;
         }
@@ -434,7 +442,11 @@ int findBreakBackwards(int &breakPos, QString text, QFontMetrics *fm, int maxWid
 
     // does full text fit?
     breakPos = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    usedWidth = fm->horizontalAdvance(text);
+#else
     usedWidth = fm->width(text);
+#endif
     if (usedWidth < maxWidth) {
         return usedWidth;
     }
@@ -444,7 +456,11 @@ int findBreakBackwards(int &breakPos, QString text, QFontMetrics *fm, int maxWid
     int topPos = text.length();
     while (qAbs(maxWidth - usedWidth) > 3 * fm->maxWidth()) {
         int halfPos = (breakPos + topPos) / 2;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        int halfWidth = fm->horizontalAdvance(text.mid(halfPos));
+#else
         int halfWidth = fm->width(text.mid(halfPos));
+#endif
         if (halfWidth < maxWidth) {
             breakPos = halfPos;
             usedWidth = halfWidth;
@@ -475,7 +491,11 @@ int findBreakBackwards(int &breakPos, QString text, QFontMetrics *fm, int maxWid
         lastCat = cat;
 
         breakPos = pos;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        usedWidth = fm->horizontalAdvance(text.mid(breakPos));
+#else
         usedWidth = fm->width(text.mid(breakPos));
+#endif
         if (usedWidth < maxWidth) {
             break;
         }
@@ -641,7 +661,11 @@ bool RectDrawing::drawField(QPainter *p, int f, DrawParams *dp)
     // stop as soon as possible when there is no space for "..."
     static int dotW = 0;
     if (!dotW) {
-        dotW = _fm->width("...");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        dotW = _fm->horizontalAdvance(QLatin1String("..."));
+#else
+        dotW = _fm->width(QLatin1String("..."));
+#endif
     }
     if (width < dotW) {
         return false;
@@ -671,7 +695,11 @@ bool RectDrawing::drawField(QPainter *p, int f, DrawParams *dp)
     }
 
     // width of text and pixmap to be drawn
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    int w = pixW + _fm->horizontalAdvance(name);
+#else
     int w = pixW + _fm->width(name);
+#endif
 
     // if we have limited space at 1st line:
     // use it only if whole name does fit in last line...
@@ -749,7 +777,11 @@ bool RectDrawing::drawField(QPainter *p, int f, DrawParams *dp)
         /* truncate and add ... if needed */
         if (w > width) {
             name = _fm->elidedText(name, Qt::ElideRight, width - pixW);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+            w = _fm->horizontalAdvance(name) + pixW;
+#else
             w = _fm->width(name) + pixW;
+#endif
         }
 
         int x = 0;
@@ -780,7 +812,11 @@ bool RectDrawing::drawField(QPainter *p, int f, DrawParams *dp)
             break;
         }
         name = remaining;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        w = pixW + _fm->horizontalAdvance(name);
+#else
         w = pixW + _fm->width(name);
+#endif
     }
 
     // make sure the pix stays visible

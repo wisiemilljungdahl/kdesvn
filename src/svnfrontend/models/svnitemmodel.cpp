@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -173,9 +173,11 @@ void SvnItemModel::setRootNodeStat(const svn::StatusPtr &stat)
 void SvnItemModel::clear()
 {
     int numRows = m_Data->m_rootNode->childList().count();
-    beginRemoveRows(QModelIndex(), 0, numRows);
+    if (numRows > 0)
+        beginRemoveRows(QModelIndex(), 0, numRows - 1);
     m_Data->clear();
-    endRemoveRows();
+    if (numRows > 0)
+        endRemoveRows();
 }
 
 void SvnItemModel::beginRemoveRows(const QModelIndex &parent, int first, int last)
@@ -384,19 +386,19 @@ int SvnItemModel::checkDirs(const QString &_what, SvnItemModelNode *_parent)
     svn::StatusEntries neweritems;
     svnWrapper()->getaddedItems(what, neweritems);
     dlist += neweritems;
-    svn::StatusEntries::iterator it = dlist.begin();
     SvnItemModelNode *node = nullptr;
-    for (; it != dlist.end(); ++it) {
-        if ((*it)->path() == what || (*it)->entry().url().toString() == what) {
+    for (auto it = dlist.begin(); it != dlist.end(); ++it) {
+        const svn::StatusPtr &sp = *it;
+        if (sp->path() == what || sp->entry().url().toString() == what) {
             if (!_parent) {
                 // toplevel item
                 beginInsertRows(m_Data->indexForNode(m_Data->m_rootNode), 0, 0);
-                if ((*it)->entry().kind() == svn_node_dir) {
+                if (sp->entry().kind() == svn_node_dir) {
                     node = new SvnItemModelNodeDir(m_Data->m_rootNode, svnWrapper(), m_Data->m_Display);
                 } else {
                     node = new SvnItemModelNode(m_Data->m_rootNode, svnWrapper(), m_Data->m_Display);
                 }
-                node->setStat((*it));
+                node->setStat(sp);
                 m_Data->m_rootNode->m_Children.prepend(node);
                 endInsertRows();
             }
@@ -428,21 +430,20 @@ void SvnItemModel::insertDirs(SvnItemModelNode *_parent, svn::StatusEntries &dli
     }
     SvnItemModelNode *node = nullptr;
     beginInsertRows(ind, parent->childList().count(), parent->childList().count() + dlist.count() - 1);
-    svn::StatusEntries::iterator it = dlist.begin();
 #ifdef DEBUG_TIMER
     QTime _counttime;
     _counttime.start();
 #endif
-    for (; it != dlist.end(); ++it) {
+    for (const svn::StatusPtr &sp : dlist) {
 #ifdef DEBUG_TIMER
         _counttime.restart();
 #endif
-        if (m_Data->MustCreateDir(*(*it))) {
+        if (m_Data->MustCreateDir(*sp)) {
             node = new SvnItemModelNodeDir(parent, svnWrapper(), m_Data->m_Display);
         } else {
             node = new SvnItemModelNode(parent, svnWrapper(), m_Data->m_Display);
         }
-        node->setStat((*it));
+        node->setStat(sp);
 #ifdef DEBUG_TIMER
 //        qCDebug(KDESVN_LOG)<<"Time creating item: "<<_counttime.elapsed();
         _counttime.restart();
@@ -562,7 +563,7 @@ bool SvnItemModel::dropUrls(const QList<QUrl> &data, Qt::DropAction action, int 
 QMimeData *SvnItemModel::mimeData(const QModelIndexList &indexes)const
 {
     QList<QUrl> urls;
-    foreach (const QModelIndex &index, indexes) {
+    for (const QModelIndex &index : indexes) {
         if (index.column() == 0) {
             urls << m_Data->nodeForIndex(index)->kdeName(m_Data->m_Display->baseRevision());
         }
@@ -656,9 +657,9 @@ void SvnItemModel::initDirWatch()
     m_Data->m_DirWatch = nullptr;
     if (m_Data->m_Display->isWorkingCopy()) {
         m_Data->m_DirWatch = new KDirWatch(this);
-        connect(m_Data->m_DirWatch, SIGNAL(dirty(QString)), this, SLOT(slotDirty(QString)));
-        connect(m_Data->m_DirWatch, SIGNAL(created(QString)), this, SLOT(slotCreated(QString)));
-        connect(m_Data->m_DirWatch, SIGNAL(deleted(QString)), this, SLOT(slotDeleted(QString)));
+        connect(m_Data->m_DirWatch, &KDirWatch::dirty, this, &SvnItemModel::slotDirty);
+        connect(m_Data->m_DirWatch, &KDirWatch::created, this, &SvnItemModel::slotCreated);
+        connect(m_Data->m_DirWatch, &KDirWatch::deleted, this, &SvnItemModel::slotDeleted);
         if (m_Data->m_DirWatch) {
             m_Data->m_DirWatch->addDir(m_Data->m_Display->baseUri() + QLatin1Char('/'), KDirWatch::WatchDirOnly);
             m_Data->m_DirWatch->startScan(true);
@@ -726,14 +727,11 @@ void SvnItemModel::checkAddNewItems(const QModelIndex &ind)
     if (!svnWrapper()->makeStatus(what, dlist, m_Data->m_Display->baseRevision(), false, true, true)) {
         return;
     }
-    svn::StatusEntries::iterator it;
-    for (it = dlist.begin(); it != dlist.end();) {
-        if (n->contains((*it)->path()) || (*it)->path() == what) {
-            it = dlist.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    const auto pred = [&](const svn::StatusPtr &sp) -> bool
+    {
+      return n->contains(sp->path()) || sp->path() == what;
+    };
+    dlist.erase(std::remove_if(dlist.begin(), dlist.end(), pred), dlist.end());
     if (!dlist.isEmpty()) {
         insertDirs(n, dlist);
     }
@@ -831,9 +829,7 @@ bool SvnItemModel::refreshDirnode(SvnItemModelNodeDir *node, bool check_empty, b
         dlist += neweritems;
     }
 
-    svn::StatusEntries::iterator it = dlist.begin();
-
-    for (it = dlist.begin(); it != dlist.end(); ++it) {
+    for (auto it = dlist.begin(); it != dlist.end(); ++it) {
         if ((*it)->path() == what) {
             dlist.erase(it);
             break;
@@ -841,15 +837,15 @@ bool SvnItemModel::refreshDirnode(SvnItemModelNodeDir *node, bool check_empty, b
     }
     QModelIndex ind = m_Data->indexForNode(node);
     for (int i = 0; i < node->m_Children.size(); ++i) {
+        const SvnItemModelNode *n = node->m_Children[i];
         bool found = false;
-        for (it = dlist.begin(); it != dlist.end(); ++it) {
-            if ((*it)->path() == node->m_Children[i]->fullName()) {
+        for (const auto &entry : qAsConst(dlist)) {
+            if (entry->path() == n->fullName()) {
                 found = true;
                 break;
             }
         }
         if (!found) {
-            SvnItemModelNode *n = node->m_Children[i];
             beginRemoveRows(ind, i, i);
             node->m_Children.removeAt(i);
             delete n;
@@ -858,15 +854,15 @@ bool SvnItemModel::refreshDirnode(SvnItemModelNodeDir *node, bool check_empty, b
         }
     }
 
-    for (it = dlist.begin(); it != dlist.end();) {
+    for (auto it = dlist.begin(); it != dlist.end();) {
         int index = node->indexOf((*it)->path());
         if (index != -1) {
-            node->m_Children[index]->setStat((*it));
-            if((*it)->nodeStatus() == svn_wc_status_external) {
-                refreshItem(node->m_Children[index]);
+            SvnItemModelNode *n = node->m_Children[index];
+            n->setStat((*it));
+            if ((*it)->nodeStatus() == svn_wc_status_external) {
+                refreshItem(n);
             }
-            if (node->m_Children[index]->NodeIsDir() != node->m_Children[index]->isDir()) {
-                SvnItemModelNode *n = node->m_Children[index];
+            if (n->NodeIsDir() != n->isDir()) {
                 beginRemoveRows(ind, index, index);
                 node->m_Children.removeAt(index);
                 delete n;
@@ -881,17 +877,17 @@ bool SvnItemModel::refreshDirnode(SvnItemModelNodeDir *node, bool check_empty, b
 
     // make sure that we do not read in the whole tree when just refreshing the current tree.
     if (!node->m_Children.isEmpty() && !notrec) {
-        for (int i = 0; i < node->m_Children.size(); ++i) {
-            if (node->m_Children[i]->NodeIsDir()) {
+        for (auto &child : node->m_Children) {
+            if (child->NodeIsDir()) {
                 // both other parameters makes no sense at this point - defaults
-                refreshDirnode(static_cast<SvnItemModelNodeDir *>(node->m_Children[i]), false, false);
+                refreshDirnode(static_cast<SvnItemModelNodeDir *>(child), false, false);
             }
         }
     }
     // after so we don't recurse about it.
     insertDirs(node, dlist);
     if (!dlist.isEmpty()) {
-        itemsFetched(m_Data->indexForNode(node));
+        emit itemsFetched(m_Data->indexForNode(node));
     }
     return true;
 }
@@ -910,9 +906,9 @@ int SvnItemModel::checkUnversionedDirs(SvnItemModelNode *_parent)
     }
     svn::StatusEntries dlist;
     SvnItemModelNodeDir *n = static_cast<SvnItemModelNodeDir *>(_parent);
-    for (QFileInfoList::size_type i = 0; i < list.size(); ++i) {
-        if (!(n->contains(list[i].absoluteFilePath()) || list[i].absoluteFilePath() == n->fullName())) {
-            svn::StatusPtr stat(new svn::Status(list[i].absoluteFilePath()));
+    for (const auto &fi : list) {
+        if (!(n->contains(fi.absoluteFilePath()) || fi.absoluteFilePath() == n->fullName())) {
+            svn::StatusPtr stat(new svn::Status(fi.absoluteFilePath()));
             dlist.append(stat);
         }
     }

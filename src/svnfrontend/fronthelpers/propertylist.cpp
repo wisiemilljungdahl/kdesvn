@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2007 by Rajko Albrecht  ral@alwins-world.de             *
- *   http://kdesvn.alwins-world.de/                                        *
+ *   https://kde.org/applications/development/org.kde.kdesvn               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -31,7 +31,7 @@ Propertylist::Propertylist(QWidget *parent)
     , m_Dir(false)
 {
     setItemDelegate(new KMultilineDelegate(this));
-    QTimer::singleShot(0, this, SLOT(init()));
+    QTimer::singleShot(0, this, &Propertylist::init);
 }
 
 Propertylist::~Propertylist()
@@ -49,14 +49,14 @@ void Propertylist::init()
     setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     setContextMenuPolicy(Qt::ActionsContextMenu);
-    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
-            this, SLOT(slotItemChanged(QTreeWidgetItem*,int)), Qt::UniqueConnection);
+    connect(this, &QTreeWidget::itemChanged,
+            this, &Propertylist::slotItemChanged, Qt::UniqueConnection);
     resizeColumnToContents(0);
 }
 
 void Propertylist::displayList(const svn::PathPropertiesMapListPtr &propList, bool editable, bool isDir, const QString &aCur)
 {
-    disconnect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(slotItemChanged(QTreeWidgetItem*,int)));
+    disconnect(this, &QTreeWidget::itemChanged, this, &Propertylist::slotItemChanged);
     viewport()->setUpdatesEnabled(false);
     clear();
     m_Dir = isDir;
@@ -65,8 +65,7 @@ void Propertylist::displayList(const svn::PathPropertiesMapListPtr &propList, bo
         if (!propList->isEmpty()) {
             /* just want the first one */
             const svn::PropertiesMap pmap = propList->at(0).second;
-            svn::PropertiesMap::const_iterator pit;
-            for (pit = pmap.constBegin(); pit != pmap.constEnd(); ++pit) {
+            for (auto pit = pmap.constBegin(); pit != pmap.constEnd(); ++pit) {
                 PropertyListViewItem *ki = new PropertyListViewItem(this,
                                                                     pit.key(),
                                                                     pit.value());
@@ -78,8 +77,8 @@ void Propertylist::displayList(const svn::PathPropertiesMapListPtr &propList, bo
     }
     viewport()->setUpdatesEnabled(true);
     viewport()->repaint();
-    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
-            this, SLOT(slotItemChanged(QTreeWidgetItem*,int)), Qt::UniqueConnection);
+    connect(this, &QTreeWidget::itemChanged,
+            this, &Propertylist::slotItemChanged, Qt::UniqueConnection);
     resizeColumnToContents(0);
 }
 
@@ -104,7 +103,7 @@ void Propertylist::slotItemChanged(QTreeWidgetItem *_item, int col)
         return;
     }
     bool fail = false;
-    disconnect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(slotItemChanged(QTreeWidgetItem*,int)));
+    disconnect(this, &QTreeWidget::itemChanged, this, &Propertylist::slotItemChanged);
     if (PropertyListViewItem::protected_Property(item->text(0)) ||
             PropertyListViewItem::protected_Property(item->currentName())) {
         KMessageBox::error(this, i18n("This property may not set by users.\nRejecting it."), i18n("Protected property"));
@@ -117,7 +116,7 @@ void Propertylist::slotItemChanged(QTreeWidgetItem *_item, int col)
         item->setText(1, item->currentValue());
         fail = true;
     }
-    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(slotItemChanged(QTreeWidgetItem*,int)));
+    connect(this, &QTreeWidget::itemChanged, this, &Propertylist::slotItemChanged);
     if (fail) {
         return;
     }
@@ -155,12 +154,4 @@ bool Propertylist::checkExisting(const QString &aName, QTreeWidgetItem *it)
         ++iter;
     }
     return false;
-}
-
-void Propertylist::addCallback(QObject *ob)
-{
-    if (ob) {
-        connect(this, SIGNAL(sigSetProperty(svn::PropertiesMap,QStringList,QString)),
-                ob, SLOT(slotChangeProperties(svn::PropertiesMap,QStringList,QString)));
-    }
 }

@@ -31,11 +31,8 @@ EditPropsDlg::EditPropsDlg(bool bAddMode, QWidget *parent)
     if (bAddMode) {
         setWindowTitle(i18nc("@title:window", "Add Property"));
     }
-    connect(m_ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(m_ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(m_ui->helpButton, SIGNAL(clicked(bool)), this, SLOT(showHelp()));
-    m_ui->helpButton->setIcon(QIcon::fromTheme(QStringLiteral("help-hint")));
-
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     /// @TODO Read these values from a text or config file
     fileProperties += QStringLiteral("svn:eol-style");
@@ -86,7 +83,7 @@ EditPropsDlg::EditPropsDlg(bool bAddMode, QWidget *parent)
                         "A non-recursive attempt will fail, and a recursive attempt "
                         "will set the property only on the file children of the folder.");
     /* TRANSLATORS: Do not translate "example" in the URL because this is according
-       TRANSLATORS: to http://www.rfc-editor.org/rfc/rfc2606.txt a reserved URL.*/
+       TRANSLATORS: to https://www.rfc-editor.org/rfc/rfc2606.txt a reserved URL.*/
     dirComments += i18n("A newline separated list of module specifiers, each "
                         "consisting of a relative directory path, optional revision "
                         "flags, and a URL. For example:<br/>"
@@ -99,7 +96,7 @@ EditPropsDlg::EditPropsDlg(bool bAddMode, QWidget *parent)
                         "mimetype) is treated as text. Anything else is treated as binary.");
     dirComments += i18n("Label text to show for the edit box where the user enters the issue number.");
     /* TRANSLATORS: Do not translate "example" in the URL because this is according
-       TRANSLATORS: to http://www.rfc-editor.org/rfc/rfc2606.txt a reserved URL.*/
+       TRANSLATORS: to https://www.rfc-editor.org/rfc/rfc2606.txt a reserved URL.*/
     dirComments += i18n("URL pointing to the issue tracker. It must contain "
                         "<b>%BUGID%</b> which gets replaced with the bug issue number. Example:<br/>"
                         "<nobr><b>http://example.com/mantis/view.php?id=%BUGID%</b></nobr>");
@@ -124,7 +121,8 @@ EditPropsDlg::EditPropsDlg(bool bAddMode, QWidget *parent)
     m_ui->m_NameEdit->setHistoryItems(fileProperties, true);
 
     m_ui->m_NameEdit->setToolTip(i18n("Select or enter new property"));
-    connect(m_ui->m_NameEdit, SIGNAL(activated(QString)), this, SLOT(updateToolTip(QString)));
+    connect(m_ui->m_NameEdit, QOverload<const QString &>::of(&KHistoryComboBox::activated),
+            this, &EditPropsDlg::updateToolTip);
 }
 
 EditPropsDlg::~EditPropsDlg()
@@ -183,12 +181,4 @@ void EditPropsDlg::setPropName(const QString &n)
 void EditPropsDlg::setPropValue(const QString &v)
 {
     m_ui->m_ValueEdit->setText(v);
-}
-
-void EditPropsDlg::showHelp()
-{
-    QPoint pos = m_ui->m_ValueEdit->pos();
-    pos.setX(pos.x() + m_ui->m_ValueEdit->width() / 2);
-    pos.setY(pos.y() + m_ui->m_ValueEdit->height() / 4);
-    QWhatsThis::showText(mapToGlobal(pos), m_ui->m_NameEdit->toolTip());
 }

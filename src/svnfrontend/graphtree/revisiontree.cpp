@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "revisiontree.h"
 #include "../stopdlg.h"
+#include "../ccontextlistener.h"
 #include "svnqt/log_entry.h"
 #include "svnqt/cache/LogCache.h"
 #include "svnqt/cache/ReposLog.h"
@@ -40,6 +41,7 @@
 #define INTERNALCOPY 1
 #define INTERNALRENAME 2
 
+class CContextListener;
 class RtreeData
 {
 public:
@@ -58,7 +60,7 @@ public:
     RevTreeWidget *m_TreeDisplay;
 
     svn::ClientP m_Client;
-    QObject *m_Listener;
+    CContextListener *m_Listener;
 
     bool getLogs(const QString &, const svn::Revision &startr, const svn::Revision &endr, const QString &origin);
 };
@@ -111,7 +113,7 @@ bool RtreeData::getLogs(const QString &reposRoot, const svn::Revision &startr, c
 }
 
 RevisionTree::RevisionTree(const svn::ClientP &aClient,
-                           QObject *aListener,
+                           CContextListener *aListener,
                            const QString &reposRoot,
                            const svn::Revision &startr, const svn::Revision &endr,
                            const QString &origin,
@@ -135,9 +137,8 @@ RevisionTree::RevisionTree(const svn::ClientP &aClient,
     m_Data->progress->setAutoClose(false);
     m_Data->progress->setWindowModality(Qt::WindowModal);
     bool cancel = false;
-    svn::LogEntriesMap::Iterator it;
-    unsigned count = 0;
-    for (it = m_Data->m_OldHistory.begin(); it != m_Data->m_OldHistory.end(); ++it) {
+    int count = 0;
+    for (auto it = m_Data->m_OldHistory.begin(); it != m_Data->m_OldHistory.end(); ++it) {
         m_Data->progress->setValue(count);
         QCoreApplication::processEvents();
         if (m_Data->progress->wasCanceled()) {
@@ -340,7 +341,7 @@ static QString uniqueNodeName(long rev, const QString &path)
     QString res = QString::fromUtf8(path.toLocal8Bit().toBase64());
     res.replace(QLatin1Char('\"'), QLatin1String("_quot_"));
     res.replace(QLatin1Char(' '), QLatin1String("_space_"));
-    QString n; n.sprintf("%05ld", rev);
+    QString n = QString::asprintf("%05ld", rev);
     return QLatin1Char('\"') + n + QLatin1Char('_') + res + QLatin1Char('\"');
 }
 
@@ -500,7 +501,7 @@ bool RevisionTree::bottomUpScan(long startrev, unsigned recurse, const QString &
     return !cancel;
 }
 
-QWidget *RevisionTree::getView()
+RevTreeWidget *RevisionTree::getView()
 {
     return m_Data->m_TreeDisplay;
 }

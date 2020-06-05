@@ -456,7 +456,7 @@ void SvnItemModel::insertDirs(SvnItemModelNode *_parent, svn::StatusEntries &dli
             }
         }
 
-        if((*it)->nodeStatus() == svn_wc_status_external) {
+        if(sp->nodeStatus() == svn_wc_status_external) {
             refreshItem(node);
         }
 #ifdef DEBUG_TIMER
